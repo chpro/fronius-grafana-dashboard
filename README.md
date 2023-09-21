@@ -123,14 +123,14 @@ Here are some screenshots of the dashboard:
 ### Grafana
 - [Grafana](https://github.com/grafana/grafana)
 
-### Based on Work Of
+#### Based on Work Of
 - [Powerwall Dashboard by jasonacox](https://github.com/jasonacox/Powerwall-Dashboard)
 
 ### Telegraf and Influx
 - [Telegraf](https://github.com/influxdata/telegraf)
 - [InfluxDB](https://github.com/influxdata/influxdb)
 
-### Based on Work Of
+#### Based on Work Of
 - [Fronius-to-Influx by szymi-](https://github.com/szymi-/fronius-to-influx)
 - [Solar Panel Monitoring with Telegraf](https://gist.github.com/farmio/618ca3c1b3f335dd966b19a92acef832)
 - [How I Created a Telegraf Plugin to Monitor Solar Panels](https://thenewstack.io/how-i-created-a-telegraf-plugin-to-monitor-solar-panels/)
