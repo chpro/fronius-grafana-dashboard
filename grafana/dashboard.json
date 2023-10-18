@@ -122,6 +122,14 @@
                 {
                   "id": "custom.neutral",
                   "value": 0
+                },
+                {
+                  "id": "min",
+                  "value": -10000
+                },
+                {
+                  "id": "max",
+                  "value": 10000
                 }
               ]
             },
@@ -138,6 +146,70 @@
                 {
                   "id": "custom.neutral",
                   "value": 0
+                },
+                {
+                  "id": "min",
+                  "value": -10000
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Storage"
+              },
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "super-light-purple",
+                        "value": null
+                      },
+                      {
+                        "color": "dark-purple",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "id": "custom.neutral",
+                  "value": 0
+                },
+                {
+                  "id": "min",
+                  "value": -5000
+                },
+                {
+                  "id": "max",
+                  "value": 5000
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Charge"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "percent"
+                },
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "dark-green",
+                        "value": null
+                      }
+                    ]
+                  }
                 }
               ]
             }
@@ -153,7 +225,10 @@
             "values": false
           },
           "showThresholdLabels": false,
-          "showThresholdMarkers": true
+          "showThresholdMarkers": true,
+          "text": {
+            "valueSize": 20
+          }
         },
         "pluginVersion": "10.0.3",
         "targets": [
@@ -177,6 +252,16 @@
                 "jsonPath": "$.site.P_Grid",
                 "language": "jsonpath",
                 "name": "Grid Usage"
+              },
+              {
+                "jsonPath": "$.site.P_Akku",
+                "language": "jsonpath",
+                "name": "Storage"
+              },
+              {
+                "jsonPath": "$.inverters[0].SOC",
+                "language": "jsonpath",
+                "name": "Charge"
               }
             ],
             "method": "GET",
@@ -340,6 +425,64 @@
                           "index": 5,
                           "text": "Too low DC power for feed-in"
                         },
+                        "1240": {
+                          "color": "super-light-red",
+                          "index": 7,
+                          "text": "No battery detected"
+                        },
+                        "-1": {
+                          "color": "transparent",
+                          "index": 6,
+                          "text": "Offline"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Battery"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "super-light-orange",
+                          "index": 0,
+                          "text": "Standby"
+                        },
+                        "1": {
+                          "color": "dark-yellow",
+                          "index": 1,
+                          "text": "Inactive"
+                        },
+                        "2": {
+                          "color": "purple",
+                          "index": 2,
+                          "text": "Darkstart"
+                        },
+                        "3": {
+                          "color": "green",
+                          "index": 3,
+                          "text": "Active"
+                        },
+                        "4": {
+                          "color": "red",
+                          "index": 4,
+                          "text": "Fault"
+                        },
+                        "5": {
+                          "color": "super-light-purple",
+                          "index": 5,
+                          "text": "Updating"
+                        },
                         "-1": {
                           "color": "transparent",
                           "index": 6,
@@ -461,6 +604,50 @@
             ],
             "tags": [],
             "tz": "$tz"
+          },
+          {
+            "alias": "Battery",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "b4303db2-42a8-4e0f-910e-98b80379bd54"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "measurement": "storage",
+            "orderByTime": "ASC",
+            "policy": "autogen",
+            "query": "SELECT min(\"Status_BatteryCell\") FROM \"autogen\".\"storage\" WHERE $timeFilter GROUP BY time(5m) fill(-1) tz('$tz')",
+            "rawQuery": true,
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "Status_BatteryCell"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
           }
         ],
         "title": "Inverter Status",
@@ -920,9 +1107,31 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "red",
+                  "fixedColor": "purple",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": -101
+              },
+              {
+                "id": "max",
+                "value": 101
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "solid"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
               }
             ]
           },
@@ -992,46 +1201,6 @@
           },
           {
             "matcher": {
-              "id": "byRegexp",
-              "options": "Charge|Reserve"
-            },
-            "properties": [
-              {
-                "id": "custom.drawStyle",
-                "value": "line"
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 0
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 2
-              },
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "decimals",
-                "value": 0
-              },
-              {
-                "id": "min",
-                "value": -101
-              },
-              {
-                "id": "max",
-                "value": 101
-              }
-            ]
-          },
-          {
-            "matcher": {
               "id": "byName",
               "options": "Sun altitude"
             },
@@ -1079,78 +1248,6 @@
                   "legend": true,
                   "tooltip": true,
                   "viz": false
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Grid Down"
-            },
-            "properties": [
-              {
-                "id": "custom.axisPlacement",
-                "value": "hidden"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "min",
-                "value": 0
-              },
-              {
-                "id": "max",
-                "value": 30
-              },
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": true,
-                  "tooltip": true,
-                  "viz": false
-                }
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 24
-              },
-              {
-                "id": "custom.spanNulls",
-                "value": 120000
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 0
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Reserve"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#f2495c75",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
-                  "fill": "dash"
                 }
               }
             ]
@@ -1208,6 +1305,36 @@
               {
                 "id": "custom.spanNulls",
                 "value": 120000
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Storage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Storage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-purple",
+                  "mode": "fixed"
+                }
               }
             ]
           }
@@ -1540,50 +1667,6 @@
           ]
         },
         {
-          "alias": "Reserve",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "none"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "",
-          "rawQuery": true,
-          "refId": "K",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "backup_reserve_percent"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
           "alias": "Charge",
           "datasource": {
             "type": "influxdb",
@@ -1598,69 +1681,24 @@
             },
             {
               "params": [
-                "none"
+                "null"
               ],
               "type": "fill"
             }
           ],
           "hide": false,
-          "measurement": "powerflow",
+          "measurement": "storage",
           "orderByTime": "ASC",
           "policy": "autogen",
           "query": "",
-          "rawQuery": true,
+          "rawQuery": false,
           "refId": "E",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "percentage"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              },
-              {
-                "params": [
-                  " /0.95 - 5/0.95"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [],
-          "tz": "$tz"
-        },
-        {
-          "alias": "Powerwall",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "5m"
-              ],
-              "type": "time"
-            }
-          ],
-          "hide": false,
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "",
-          "rawQuery": true,
-          "refId": "C",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "from_pw+to_pw"
+                  "StateOfCharge_Relative"
                 ],
                 "type": "field"
               },
@@ -1671,6 +1709,104 @@
             ]
           ],
           "tags": [],
+          "tz": "$tz"
+        },
+        {
+          "alias": "To Storage",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Akku"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_Akku::field",
+              "operator": "<",
+              "value": "0"
+            }
+          ],
+          "tz": "$tz"
+        },
+        {
+          "alias": "From Storage",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Akku"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_Akku::field",
+              "operator": ">",
+              "value": "0"
+            }
+          ],
           "tz": "$tz"
         }
       ],
@@ -2119,7 +2255,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 0,
+          "decimals": 1,
           "mappings": [
             {
               "options": {
@@ -2135,12 +2271,12 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "purple",
+                "color": "super-light-purple",
                 "value": null
               }
             ]
           },
-          "unit": "kwatth"
+          "unit": "watth"
         },
         "overrides": []
       },
@@ -2179,16 +2315,18 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "groupBy": [],
-          "measurement": "http",
+          "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
+          "query": "SELECT abs(integral(\"P_Akku\")) / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field <= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('$tz')",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "to_pw"
+                  "P_Akku"
                 ],
                 "type": "field"
               },
@@ -2204,7 +2342,13 @@
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "P_Akku::field",
+              "operator": "<",
+              "value": "0"
+            }
+          ]
         }
       ],
       "title": "To Storage",
@@ -2866,12 +3010,12 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "purple",
+                "color": "dark-purple",
                 "value": null
               }
             ]
           },
-          "unit": "kwatth"
+          "unit": "watth"
         },
         "overrides": []
       },
@@ -2910,16 +3054,18 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "groupBy": [],
-          "measurement": "http",
+          "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
+          "query": "SELECT integral(\"P_Akku\") / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('$tz')",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "from_pw"
+                  "P_Akku"
                 ],
                 "type": "field"
               },
@@ -2935,7 +3081,14 @@
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "P_Akku::field",
+              "operator": ">",
+              "value": "0"
+            }
+          ],
+          "tz": "$tz"
         }
       ],
       "title": "From Storage",
@@ -3254,7 +3407,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
+        "w": 4,
         "x": 0,
         "y": 24
       },
@@ -3523,12 +3676,282 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 6,
+        "w": 4,
+        "x": 4,
         "y": 24
       },
       "hideTimeOverride": true,
       "id": 98,
+      "interval": "",
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('$tz')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
+          },
+          "hide": false,
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('$tz')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "timeShift": "0M/M",
+      "title": "Savings this month",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "reducer": "sum",
+              "right": "-1"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Directly Consumed",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid * -1"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "solar > home",
+            "binary": {
+              "left": "Directly Consumed",
+              "operator": "*",
+              "reducer": "sum",
+              "right": "electricity.buyEuroWh"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "solar > grid",
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "reducer": "sum",
+              "right": "electricity.sellEuroWh"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "Directly Consumed"
+              },
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "smartmeter.to_grid"
+              }
+            ],
+            "match": "any",
+            "type": "include"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "solar > grid",
+                "solar > home"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Directly Consumed": true,
+              "Directly Consumed / 1000": true,
+              "Time": true,
+              "electricity.buyEuroWh": true,
+              "electricity.sellEuroWh": true,
+              "powerflow.from_grid": true,
+              "powerflow.produced": true,
+              "powerflow.to_grid": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.produced": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid * -1": true,
+              "smartmeter.to_grid / 1000": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "solar > home"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "shades"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "solar > grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 8,
+        "y": 24
+      },
+      "hideTimeOverride": true,
+      "id": 104,
       "interval": "",
       "links": [],
       "options": {
@@ -3793,7 +4216,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
+        "w": 4,
         "x": 12,
         "y": 24
       },
@@ -4064,8 +4487,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 18,
+        "w": 4,
+        "x": 16,
         "y": 24
       },
       "hideTimeOverride": true,
@@ -4128,6 +4551,275 @@
       "timeFrom": "0y/y",
       "timeShift": "1y/y",
       "title": "Savings last year",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "reducer": "sum",
+              "right": "-1"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Directly Consumed",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid * -1"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "solar > home",
+            "binary": {
+              "left": "Directly Consumed",
+              "operator": "*",
+              "reducer": "sum",
+              "right": "electricity.buyEuroWh"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "solar > grid",
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "reducer": "sum",
+              "right": "electricity.sellEuroWh"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "Directly Consumed"
+              },
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "smartmeter.to_grid"
+              }
+            ],
+            "match": "any",
+            "type": "include"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "solar > grid",
+                "solar > home"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Directly Consumed": true,
+              "Directly Consumed / 1000": true,
+              "Time": true,
+              "electricity.buyEuroWh": true,
+              "electricity.sellEuroWh": true,
+              "powerflow.from_grid": true,
+              "powerflow.produced": true,
+              "powerflow.to_grid": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.produced": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid * -1": true,
+              "smartmeter.to_grid / 1000": true
+            },
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "solar > home"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "shades"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "solar > grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 20,
+        "y": 24
+      },
+      "hideTimeOverride": true,
+      "id": 102,
+      "interval": "",
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" GROUP BY time(1d) fill(0) tz('$tz')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" GROUP BY time(1d) fill(0)  tz('$tz')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
+          },
+          "hide": false,
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('$tz')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Total savings",
       "transformations": [
         {
           "id": "calculateField",
@@ -5485,32 +6177,44 @@
           },
           "links": [],
           "mappings": [],
-          "min": 0,
+          "max": 10000,
+          "min": -10000,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
-          "unit": "kwatth"
+          "unit": "watth"
         },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "From Powerwall"
+              "options": "From Storage"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "dark-purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Storage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-purple",
                   "mode": "fixed"
                 }
               }
@@ -5540,7 +6244,7 @@
       "pluginVersion": "9.1.2",
       "targets": [
         {
-          "alias": "From Powerwall",
+          "alias": "From Storage",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -5562,6 +6266,8 @@
           "measurement": "http",
           "orderByTime": "ASC",
           "policy": "kwh",
+          "query": "SELECT integral(\"P_Akku\")  / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field > 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('$tz')",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -5580,6 +6286,18 @@
           ],
           "tags": [],
           "tz": "$tz"
+        },
+        {
+          "alias": "To Storage",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT integral(\"P_Akku\")  / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field < 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('$tz')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
         }
       ],
       "timeFrom": "1M",
@@ -5878,8 +6596,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 14,
-        "w": 24,
+        "h": 13,
+        "w": 12,
         "x": 0,
         "y": 64
       },
@@ -6412,12 +7130,593 @@
       "type": "barchart"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "m"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 12,
+        "x": 12,
+        "y": 64
+      },
+      "id": 103,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "alias": "10kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field >= 10000) AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "9kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 10000) AND  (\"P_PV\"::field >= 9000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "8kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 9000) AND  (\"P_PV\"::field >= 8000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "7kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 8000) AND  (\"P_PV\"::field >= 7000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "6kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 7000) AND  (\"P_PV\"::field >= 6000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "E",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "5kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 6000) AND  (\"P_PV\"::field >= 5000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "F",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "4kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 5000) AND  (\"P_PV\"::field >=4000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "G",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "3kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 4000) AND  (\"P_PV\"::field >= 3000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "H",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "2kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 3000) AND  (\"P_PV\"::field >= 2000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "I",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "1kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 1000) AND  (\"P_PV\"::field >= 1)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "J",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        }
+      ],
+      "timeFrom": "30d/d",
+      "timeShift": "1d/d",
+      "title": "Monthly production grouped by kW",
+      "type": "barchart"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 78
+        "y": 77
       },
       "id": 37,
       "panels": [],
@@ -6487,7 +7786,7 @@
         "h": 5,
         "w": 8,
         "x": 0,
-        "y": 79
+        "y": 78
       },
       "id": 32,
       "interval": "",
@@ -6700,7 +7999,7 @@
         "h": 5,
         "w": 8,
         "x": 8,
-        "y": 79
+        "y": 78
       },
       "id": 62,
       "interval": "",
@@ -6933,7 +8232,7 @@
         "h": 5,
         "w": 8,
         "x": 16,
-        "y": 79
+        "y": 78
       },
       "id": 63,
       "interval": "",
@@ -7424,7 +8723,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 84
+        "y": 83
       },
       "id": 34,
       "interval": "",
@@ -7570,7 +8869,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 84
+        "y": 83
       },
       "id": 35,
       "interval": "",
@@ -7592,7 +8891,7 @@
       "pluginVersion": "9.1.2",
       "targets": [
         {
-          "alias": "Powerwall1",
+          "alias": "Temperature",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7611,478 +8910,17 @@
               "type": "fill"
             }
           ],
-          "measurement": "http",
+          "hide": false,
+          "measurement": "storage",
           "orderByTime": "ASC",
-          "policy": "pwtemps",
+          "policy": "autogen",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "PW1_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall2",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW2_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall3",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "C",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW3_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall4",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW4_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall5",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "E",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW5_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall6",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "F",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW6_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall7",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "G",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW7_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall8",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "H",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW8_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall9",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "I",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW9_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall10",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "J",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW10_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall11",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "K",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW11_temp"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "Powerwall12",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pwtemps",
-          "refId": "L",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW12_temp"
+                  "Temperature_Cell"
                 ],
                 "type": "field"
               },
@@ -8178,7 +9016,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 90
+        "y": 89
       },
       "id": 38,
       "interval": "",
@@ -8325,7 +9163,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 95
+        "y": 94
       },
       "id": 61,
       "interval": "",
@@ -8560,6 +9398,49 @@
           ],
           "tags": [],
           "tz": "$tz"
+        },
+        {
+          "alias": "DC Battery",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "storage",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "refId": "F",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "Voltage_DC"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [],
+          "tz": "$tz"
         }
       ],
       "title": "Voltages",
@@ -8645,7 +9526,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 100
+        "y": 99
       },
       "id": 77,
       "interval": "",
@@ -8880,6 +9761,49 @@
           ],
           "tags": [],
           "tz": "$tz"
+        },
+        {
+          "alias": "DC Battery",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "storage",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "refId": "F",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "Current_DC"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [],
+          "tz": "$tz"
         }
       ],
       "title": "Current",
@@ -9062,7 +9986,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 105
+        "y": 104
       },
       "id": 55,
       "options": {
@@ -9083,7 +10007,7 @@
       "pluginVersion": "9.1.2",
       "targets": [
         {
-          "alias": "PW1",
+          "alias": "Current max capacity",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -9102,16 +10026,17 @@
               "type": "fill"
             }
           ],
-          "measurement": "http",
+          "hide": false,
+          "measurement": "storage",
           "orderByTime": "ASC",
-          "policy": "pod",
+          "policy": "autogen",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "PW1_POD_nom_full_pack_energy"
+                  "Capacity_Maximum"
                 ],
                 "type": "field"
               },
@@ -9124,7 +10049,7 @@
           "tags": []
         },
         {
-          "alias": "PW2",
+          "alias": "Max designed capacity",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -9144,964 +10069,16 @@
             }
           ],
           "hide": false,
-          "measurement": "http",
+          "measurement": "storage",
           "orderByTime": "ASC",
-          "policy": "pod",
+          "policy": "autogen",
           "refId": "B",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "PW2_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW3",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "C",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW3_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW4",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW4_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW5",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "E",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW5_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW6",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "F",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW6_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW7",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW7_POD_nom_full_pack_energy\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "G",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW7_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW8",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW8_POD_nom_full_pack_energy\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "H",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW8_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW9",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW9_POD_nom_full_pack_energy\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "I",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW9_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW10",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW10_POD_nom_full_pack_energy\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "J",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW10_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW11",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW11_POD_nom_full_pack_energy\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "K",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW11_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW12",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW12_POD_nom_full_pack_energy\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "L",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW12_POD_nom_full_pack_energy"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW1 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "M",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW1_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW2 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "N",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW2_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW3 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "O",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW3_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW4 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "P",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW4_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW5 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "Q",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW5_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW6 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "refId": "R",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW6_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW7 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW7_POD_nom_energy_remaining\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "S",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW7_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW8 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW8_POD_nom_energy_remaining\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "T",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW8_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW9 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW9_POD_nom_energy_remaining\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "U",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW9_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW10 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW10_POD_nom_energy_remaining\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "V",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW10_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW11 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW11_POD_nom_energy_remaining\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "W",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW11_POD_nom_energy_remaining"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        },
-        {
-          "alias": "PW12 Charge",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "http",
-          "orderByTime": "ASC",
-          "policy": "pod",
-          "query": "SELECT mean(\"PW12_POD_nom_energy_remaining\") FROM \"pod\".\"http\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
-          "rawQuery": false,
-          "refId": "X",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "PW12_POD_nom_energy_remaining"
+                  "DesignedCapacity"
                 ],
                 "type": "field"
               },
@@ -10169,6 +10146,6 @@
   "timezone": "browser",
   "title": "Photovoltaik",
   "uid": "RSabAvRRzVz",
-  "version": 123,
+  "version": 145,
   "weekStart": ""
 }
