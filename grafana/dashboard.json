@@ -274,6 +274,178 @@
         "type": "gauge"
       }
     },
+    "e7006c4d-5436-4fb5-b22a-806f657dd36d": {
+      "name": "Power flow text",
+      "uid": "e7006c4d-5436-4fb5-b22a-806f657dd36d",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "${DS_INVERTER_STATUS POWER FLOW}"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "watt"
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Battery"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "from": -1,
+                        "result": {
+                          "color": "text",
+                          "index": 0,
+                          "text": "Idle"
+                        },
+                        "to": 1
+                      },
+                      "type": "range"
+                    },
+                    {
+                      "options": {
+                        "from": -20000,
+                        "result": {
+                          "color": "super-light-purple",
+                          "index": 1,
+                          "text": "Charging"
+                        },
+                        "to": -1
+                      },
+                      "type": "range"
+                    },
+                    {
+                      "options": {
+                        "from": 1,
+                        "result": {
+                          "color": "dark-purple",
+                          "index": 2,
+                          "text": "Discharging"
+                        },
+                        "to": 20000
+                      },
+                      "type": "range"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Grid"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "from": -20000,
+                        "result": {
+                          "color": "green",
+                          "index": 0,
+                          "text": "Feeding in"
+                        },
+                        "to": -50
+                      },
+                      "type": "range"
+                    },
+                    {
+                      "options": {
+                        "from": 50,
+                        "result": {
+                          "color": "red",
+                          "index": 1,
+                          "text": "Consuming"
+                        },
+                        "to": 20000
+                      },
+                      "type": "range"
+                    },
+                    {
+                      "options": {
+                        "from": -50,
+                        "result": {
+                          "color": "text",
+                          "index": 2,
+                          "text": "Idle"
+                        },
+                        "to": 50
+                      },
+                      "type": "range"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "text": {},
+          "textMode": "auto"
+        },
+        "pluginVersion": "10.0.3",
+        "targets": [
+          {
+            "cacheDurationSeconds": 0,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "c22db054-79a4-46c1-a749-9a7556a2a4b1"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.site.P_Akku",
+                "language": "jsonpath",
+                "name": "Battery"
+              },
+              {
+                "jsonPath": "$.site.P_Grid",
+                "language": "jsonpath",
+                "name": "Grid"
+              }
+            ],
+            "method": "GET",
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": ""
+          }
+        ],
+        "type": "stat"
+      }
+    },
     "XB8yzeRgk": {
       "name": "Inverter Status",
       "uid": "XB8yzeRgk",
@@ -676,15 +848,15 @@
               "axisLabel": "",
               "axisPlacement": "auto",
               "barAlignment": 0,
-              "drawStyle": "bars",
-              "fillOpacity": 100,
+              "drawStyle": "line",
+              "fillOpacity": 0,
               "gradientMode": "none",
               "hideFrom": {
                 "legend": false,
                 "tooltip": false,
                 "viz": false
               },
-              "lineInterpolation": "linear",
+              "lineInterpolation": "stepAfter",
               "lineWidth": 1,
               "pointSize": 5,
               "scaleDistribution": {
@@ -717,7 +889,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Solar"
+                "options": "Local Energy Production"
               },
               "properties": [
                 {
@@ -741,22 +913,6 @@
                     "fixedColor": "#3274D9",
                     "mode": "fixed"
                   }
-                },
-                {
-                  "id": "custom.drawStyle",
-                  "value": "line"
-                },
-                {
-                  "id": "custom.fillOpacity",
-                  "value": 0
-                },
-                {
-                  "id": "custom.lineWidth",
-                  "value": 1
-                },
-                {
-                  "id": "custom.lineInterpolation",
-                  "value": "stepAfter"
                 }
               ]
             },
@@ -776,18 +932,6 @@
                 {
                   "id": "custom.lineWidth",
                   "value": 1
-                },
-                {
-                  "id": "custom.lineInterpolation",
-                  "value": "stepAfter"
-                },
-                {
-                  "id": "custom.drawStyle",
-                  "value": "line"
-                },
-                {
-                  "id": "custom.fillOpacity",
-                  "value": 0
                 }
               ]
             },
@@ -803,18 +947,48 @@
                     "fixedColor": "green",
                     "mode": "fixed"
                   }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Autonomy"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "percentunit"
                 },
                 {
-                  "id": "custom.lineInterpolation",
-                  "value": "stepAfter"
-                },
-                {
-                  "id": "custom.drawStyle",
-                  "value": "line"
-                },
-                {
-                  "id": "custom.fillOpacity",
+                  "id": "min",
                   "value": 0
+                },
+                {
+                  "id": "max",
+                  "value": 1
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "dark-green",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Local Energy Consumption"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "super-light-blue",
+                    "mode": "fixed"
+                  }
                 }
               ]
             }
@@ -858,7 +1032,7 @@
             "measurement": "http",
             "orderByTime": "ASC",
             "policy": "kwh",
-            "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+            "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -883,6 +1057,17 @@
                 "value": "0"
               }
             ]
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "b4303db2-42a8-4e0f-910e-98b80379bd54"
+            },
+            "hide": false,
+            "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+            "rawQuery": true,
+            "refId": "A",
+            "resultFormat": "time_series"
           }
         ],
         "timeFrom": "12M",
@@ -920,20 +1105,78 @@
             }
           },
           {
+            "id": "calculateField",
+            "options": {
+              "alias": "Local Energy Consumption",
+              "mode": "reduceRow",
+              "reduce": {
+                "include": [
+                  "powerflow.produced",
+                  "smartmeter.to_grid"
+                ],
+                "reducer": "sum"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "LECFG",
+              "mode": "reduceRow",
+              "reduce": {
+                "include": [
+                  "Local Energy Consumption",
+                  "smartmeter.from_grid"
+                ],
+                "reducer": "sum"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "Autonomy",
+              "binary": {
+                "left": "Local Energy Consumption",
+                "operator": "/",
+                "reducer": "sum",
+                "right": "LECFG"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              }
+            }
+          },
+          {
             "id": "organize",
             "options": {
               "excludeByName": {
                 "Home Usage": false,
+                "LECFG": true,
+                "LECTG": true,
+                "Local Energy Consumption": false,
                 "powerflow.from_grid": true,
                 "powerflow.to_grid": true,
                 "smartmeter.from_grid": false,
                 "smartmeter.produced": true,
                 "smartmeter.to_grid": true
               },
-              "indexByName": {},
+              "indexByName": {
+                "Autonomy": 5,
+                "Home Usage": 2,
+                "LECFG": 8,
+                "Local Energy Consumption": 3,
+                "Time": 0,
+                "To Grid": 7,
+                "powerflow.produced": 4,
+                "smartmeter.from_grid": 6,
+                "smartmeter.to_grid": 1
+              },
               "renameByName": {
+                "Home Usage": "",
                 "powerflow.from_grid": "",
-                "powerflow.produced": "Solar",
+                "powerflow.produced": "Local Energy Production",
                 "powerflow.to_grid": "",
                 "smartmeter.from_grid": "From Grid",
                 "smartmeter.to_grid": ""
@@ -1341,7 +1584,7 @@
         ]
       },
       "gridPos": {
-        "h": 13,
+        "h": 14,
         "w": 16,
         "x": 0,
         "y": 1
@@ -1816,7 +2059,7 @@
     },
     {
       "gridPos": {
-        "h": 9,
+        "h": 11,
         "w": 7,
         "x": 17,
         "y": 1
@@ -1825,6 +2068,19 @@
       "libraryPanel": {
         "uid": "bb6b10a7-eeec-4e0d-9d8d-3d77ab01fe6a",
         "name": "Power flow"
+      }
+    },
+    {
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 17,
+        "y": 12
+      },
+      "id": 105,
+      "libraryPanel": {
+        "uid": "e7006c4d-5436-4fb5-b22a-806f657dd36d",
+        "name": "Power flow text"
       }
     },
     {
@@ -1853,7 +2109,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Directly Consumed"
+              "options": "Local Energy Consumption"
             },
             "properties": [
               {
@@ -1884,9 +2140,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 7,
-        "x": 17,
-        "y": 10
+        "w": 4,
+        "x": 20,
+        "y": 12
       },
       "id": 87,
       "options": {
@@ -1945,7 +2201,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Directly Consumed",
+            "alias": "Local Energy Consumption",
             "mode": "reduceRow",
             "reduce": {
               "include": [
@@ -2007,10 +2263,10 @@
     },
     {
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 16,
         "x": 0,
-        "y": 14
+        "y": 15
       },
       "id": 72,
       "libraryPanel": {
@@ -2019,12 +2275,124 @@
       }
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(PVFORECAST)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "super-light-yellow",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 17,
+        "y": 16
+      },
+      "hideTimeOverride": true,
+      "id": 101,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 20
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "alias": "Today",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(PVFORECAST)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "pv_forecast_watt_hours_day",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT first(\"value\") FROM \"autogen\".\"pv_forecast_watt_hours_day\" WHERE $timeFilter tz('$tz')",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [],
+          "tz": "$tz"
+        },
+        {
+          "alias": "Tomorrow",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(PVFORECAST)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"value\") FROM \"autogen\".\"pv_forecast_watt_hours_day\" WHERE $timeFilter tz('$tz')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        }
+      ],
+      "timeFrom": "+1d/d",
+      "timeShift": "0d/d",
+      "title": "Expected yield",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 21
       },
       "id": 41,
       "panels": [],
@@ -2041,7 +2409,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 0,
+          "decimals": 1,
           "mappings": [
             {
               "options": {
@@ -2070,7 +2438,7 @@
         "h": 2,
         "w": 3,
         "x": 0,
-        "y": 19
+        "y": 22
       },
       "id": 4,
       "interval": "",
@@ -2104,9 +2472,45 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
           "rawQuery": true,
           "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Load"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 1000 / 3600 * -1"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')\n",
+          "rawQuery": true,
+          "refId": "B",
           "resultFormat": "time_series",
           "select": [
             [
@@ -2157,12 +2561,123 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB_(INVERTER)}"
       },
+      "description": "comprises power sourced both from the battery and utilized directly excluding energy feed into grid",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 0,
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "super-light-blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 3,
+        "y": 22
+      },
+      "id": 78,
+      "interval": "",
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [],
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "E_Total"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": [],
+          "tz": "$tz"
+        }
+      ],
+      "title": "Local Energy Consumption",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "description": "comprises power sourced both from the battery and utilized directly",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
           "mappings": [
             {
               "options": {
@@ -2190,8 +2705,8 @@
       "gridPos": {
         "h": 2,
         "w": 3,
-        "x": 3,
-        "y": 19
+        "x": 6,
+        "y": 22
       },
       "id": 5,
       "interval": "",
@@ -2241,7 +2756,118 @@
           "tz": "$tz"
         }
       ],
-      "title": "Solar Energy",
+      "title": "Local Energy Production",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-purple",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 9,
+        "y": 22
+      },
+      "id": 6,
+      "interval": "",
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [],
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT integral(\"P_Akku\") / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('$tz')",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Akku"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 1000 / 3600"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_Akku::field",
+              "operator": ">",
+              "value": "0"
+            }
+          ],
+          "tz": "$tz"
+        }
+      ],
+      "title": "From Storage",
       "transparent": true,
       "type": "stat"
     },
@@ -2283,8 +2909,8 @@
       "gridPos": {
         "h": 2,
         "w": 3,
-        "x": 6,
-        "y": 19
+        "x": 12,
+        "y": 22
       },
       "id": 8,
       "interval": "",
@@ -2360,429 +2986,7 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB_(INVERTER)}"
       },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 0,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 3,
-        "x": 9,
-        "y": 19
-      },
-      "id": 7,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 30
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [],
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "SELECT max(\"EnergyReal_WAC_Minus_Absolute\") -  min(\"EnergyReal_WAC_Minus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "P_Grid"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600 * -1"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "P_Grid::field",
-              "operator": "<",
-              "value": "0"
-            }
-          ]
-        }
-      ],
-      "title": "To Grid",
-      "transparent": true,
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(INVERTER)}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 0,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 3,
-        "x": 12,
-        "y": 19
-      },
-      "id": 69,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 30
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "alias": "",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [],
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "SELECT (last(\"EnergyReal_WAC_Plus_Absolute\") - first(\"EnergyReal_WAC_Plus_Absolute\")) - (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')\n",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "P_Grid"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": []
-        }
-      ],
-      "title": "Net Grid Usage",
-      "transparent": true,
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(INVERTER)}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 3,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "yellow",
-                "value": null
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 7,
-        "x": 17,
-        "y": 19
-      },
-      "id": 79,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 30
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [],
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "SELECT last(\"E_Total\") FROM \"autogen\".\"powerflow\"",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "E_Total"
-                ],
-                "type": "field"
-              }
-            ]
-          ],
-          "tags": [],
-          "tz": "$tz"
-        }
-      ],
-      "title": "Total solar energy production",
-      "transparent": true,
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(INVERTER)}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 0,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "super-light-blue",
-                "value": null
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 3,
-        "x": 0,
-        "y": 21
-      },
-      "id": 78,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 30
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [],
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "E_Total"
-                ],
-                "type": "field"
-              }
-            ]
-          ],
-          "tags": [],
-          "tz": "$tz"
-        }
-      ],
-      "title": "Directly Consumed",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "mode": "reduceRow",
-            "reduce": {
-              "include": [
-                "powerflow.produced",
-                "smartmeter.to_grid"
-              ],
-              "reducer": "sum"
-            },
-            "replaceFields": true
-          }
-        }
-      ],
-      "transparent": true,
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(INVERTER)}"
-      },
+      "description": "comprises power sourced both from the battery and utilized directly",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2795,7 +2999,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "yellow",
+                "color": "dark-green",
                 "value": null
               }
             ]
@@ -2807,8 +3011,8 @@
       "gridPos": {
         "h": 2,
         "w": 3,
-        "x": 3,
-        "y": 21
+        "x": 0,
+        "y": 24
       },
       "id": 85,
       "options": {
@@ -2852,7 +3056,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2878,9 +3082,60 @@
           ],
           "tags": [],
           "tz": "$tz"
+        },
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Load"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " /1000/ 3600"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [],
+          "tz": "$tz"
         }
       ],
-      "title": "% Solar Powered",
+      "title": "Autonomy",
       "transformations": [
         {
           "id": "calculateField",
@@ -3010,117 +3265,6 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "dark-purple",
-                "value": null
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 3,
-        "x": 6,
-        "y": 21
-      },
-      "id": 6,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 30
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [],
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "SELECT integral(\"P_Akku\") / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('$tz')",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "P_Akku"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 1000 / 3600"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "P_Akku::field",
-              "operator": ">",
-              "value": "0"
-            }
-          ],
-          "tz": "$tz"
-        }
-      ],
-      "title": "From Storage",
-      "transparent": true,
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(INVERTER)}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 0,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
                 "color": "red",
                 "value": null
               }
@@ -3133,8 +3277,8 @@
       "gridPos": {
         "h": 2,
         "w": 3,
-        "x": 9,
-        "y": 21
+        "x": 3,
+        "y": 24
       },
       "id": 9,
       "interval": "",
@@ -3206,19 +3350,30 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(PVFORECAST)}"
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "super-light-yellow",
+                "color": "green",
                 "value": null
               }
             ]
@@ -3229,53 +3384,43 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 7,
-        "x": 17,
-        "y": 21
+        "w": 3,
+        "x": 6,
+        "y": 24
       },
-      "hideTimeOverride": true,
-      "id": 101,
+      "id": 7,
+      "interval": "",
+      "links": [],
+      "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [],
+          "calcs": [
+            "sum"
+          ],
           "fields": "",
           "values": false
         },
         "text": {
-          "valueSize": 20
+          "valueSize": 30
         },
         "textMode": "auto"
       },
       "pluginVersion": "10.0.3",
       "targets": [
         {
-          "alias": "Today",
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(PVFORECAST)}"
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "pv_forecast_watt_hours_day",
+          "groupBy": [],
+          "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT first(\"value\") FROM \"autogen\".\"pv_forecast_watt_hours_day\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT max(\"EnergyReal_WAC_Minus_Absolute\") -  min(\"EnergyReal_WAC_Minus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3283,35 +3428,254 @@
             [
               {
                 "params": [
-                  "value"
+                  "P_Grid"
                 ],
                 "type": "field"
               },
               {
                 "params": [],
-                "type": "mean"
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 3600 * -1"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_Grid::field",
+              "operator": "<",
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "title": "To Grid",
+      "transformations": [
+        {
+          "id": "configFromData",
+          "options": {
+            "applyTo": {
+              "id": "byName",
+              "options": "smartmeter.max_min"
+            },
+            "configRefId": "A",
+            "mappings": [
+              {
+                "fieldName": "smartmeter.max_min",
+                "handlerKey": "displayName"
+              }
+            ]
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 9,
+        "y": 24
+      },
+      "id": 69,
+      "interval": "",
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [],
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT (last(\"EnergyReal_WAC_Plus_Absolute\") - first(\"EnergyReal_WAC_Plus_Absolute\")) - (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Grid"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 3600"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Net Grid Usage",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 3,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 12,
+        "y": 24
+      },
+      "id": 79,
+      "interval": "",
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [],
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT last(\"E_Total\") FROM \"autogen\".\"powerflow\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "E_Total"
+                ],
+                "type": "field"
               }
             ]
           ],
           "tags": [],
           "tz": "$tz"
-        },
-        {
-          "alias": "Tomorrow",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(PVFORECAST)}"
-          },
-          "hide": false,
-          "query": "SELECT last(\"value\") FROM \"autogen\".\"pv_forecast_watt_hours_day\" WHERE $timeFilter tz('$tz')",
-          "rawQuery": true,
-          "refId": "B",
-          "resultFormat": "time_series"
         }
       ],
-      "timeFrom": "+1d/d",
-      "timeShift": "0d/d",
-      "title": "Expected yield",
+      "title": "Total solar energy production",
       "transparent": true,
       "type": "stat"
     },
@@ -3321,7 +3685,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 27
       },
       "id": 80,
       "panels": [],
@@ -3346,8 +3710,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -3409,7 +3772,7 @@
         "h": 8,
         "w": 4,
         "x": 0,
-        "y": 24
+        "y": 28
       },
       "hideTimeOverride": true,
       "id": 97,
@@ -3615,8 +3978,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -3678,7 +4040,7 @@
         "h": 8,
         "w": 4,
         "x": 4,
-        "y": 24
+        "y": 28
       },
       "hideTimeOverride": true,
       "id": 98,
@@ -3885,8 +4247,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -3948,7 +4309,7 @@
         "h": 8,
         "w": 4,
         "x": 8,
-        "y": 24
+        "y": 28
       },
       "hideTimeOverride": true,
       "id": 104,
@@ -4155,8 +4516,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -4218,7 +4578,7 @@
         "h": 8,
         "w": 4,
         "x": 12,
-        "y": 24
+        "y": 28
       },
       "hideTimeOverride": true,
       "id": 99,
@@ -4426,8 +4786,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -4489,7 +4848,7 @@
         "h": 8,
         "w": 4,
         "x": 16,
-        "y": 24
+        "y": 28
       },
       "hideTimeOverride": true,
       "id": 100,
@@ -4697,8 +5056,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -4760,7 +5118,7 @@
         "h": 8,
         "w": 4,
         "x": 20,
-        "y": 24
+        "y": 28
       },
       "hideTimeOverride": true,
       "id": 102,
@@ -4954,7 +5312,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 36
       },
       "id": 89,
       "panels": [],
@@ -4987,7 +5345,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Directly Consumed"
+              "options": "Local Energy Consumption"
             },
             "properties": [
               {
@@ -5020,7 +5378,7 @@
         "h": 8,
         "w": 5,
         "x": 0,
-        "y": 33
+        "y": 37
       },
       "hideTimeOverride": true,
       "id": 82,
@@ -5082,7 +5440,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Directly Consumed",
+            "alias": "Local Energy Consumption",
             "mode": "reduceRow",
             "reduce": {
               "include": [
@@ -5168,7 +5526,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Directly Consumed"
+              "options": "Local Energy Consumption"
             },
             "properties": [
               {
@@ -5201,7 +5559,7 @@
         "h": 8,
         "w": 5,
         "x": 5,
-        "y": 33
+        "y": 37
       },
       "hideTimeOverride": true,
       "id": 86,
@@ -5263,7 +5621,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Directly Consumed",
+            "alias": "Local Energy Consumption",
             "mode": "reduceRow",
             "reduce": {
               "include": [
@@ -5349,7 +5707,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Directly Consumed"
+              "options": "Local Energy Consumption"
             },
             "properties": [
               {
@@ -5382,7 +5740,7 @@
         "h": 8,
         "w": 5,
         "x": 10,
-        "y": 33
+        "y": 37
       },
       "hideTimeOverride": true,
       "id": 88,
@@ -5443,7 +5801,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Directly Consumed",
+            "alias": "Local Energy Consumption",
             "mode": "reduceRow",
             "reduce": {
               "include": [
@@ -5529,7 +5887,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Directly Consumed"
+              "options": "Local Energy Consumption"
             },
             "properties": [
               {
@@ -5562,7 +5920,7 @@
         "h": 8,
         "w": 5,
         "x": 15,
-        "y": 33
+        "y": 37
       },
       "hideTimeOverride": true,
       "id": 92,
@@ -5624,7 +5982,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Directly Consumed",
+            "alias": "Local Energy Consumption",
             "mode": "reduceRow",
             "reduce": {
               "include": [
@@ -5690,7 +6048,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 41
+        "y": 45
       },
       "id": 22,
       "panels": [],
@@ -5702,10 +6060,12 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB_(INVERTER)}"
       },
+      "description": "comprises power sourced both from the battery and utilized directly excluding energy feed into grid",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "fixedColor": "yellow",
+            "mode": "fixed"
           },
           "custom": {
             "axisCenteredZero": false,
@@ -5744,39 +6104,19 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
+                "color": "yellow"
               }
             ]
           },
           "unit": "watth"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Solar Energy"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 46
       },
       "id": 25,
       "options": {
@@ -5794,7 +6134,7 @@
       "pluginVersion": "9.1.2",
       "targets": [
         {
-          "alias": "Solar Energy",
+          "alias": "Local Energy Production",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -5845,7 +6185,7 @@
         }
       ],
       "timeFrom": "1M",
-      "title": "Solar Energy",
+      "title": "Local Energy Production",
       "transparent": true,
       "type": "timeseries"
     },
@@ -5925,7 +6265,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Directly Consumed"
+              "options": "Local Energy Consumption"
             },
             "properties": [
               {
@@ -5972,7 +6312,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 46
       },
       "id": 24,
       "options": {
@@ -6075,7 +6415,7 @@
         {
           "id": "calculateField",
           "options": {
-            "alias": "Directly Consumed",
+            "alias": "Local Energy Consumption",
             "mode": "reduceRow",
             "reduce": {
               "include": [
@@ -6113,20 +6453,16 @@
               "smartmeter.to_grid4hu": true
             },
             "indexByName": {
-              "Directly Consumed": 2,
               "From Grid": 3,
               "Home Usage": 1,
+              "Local Energy Consumption": 2,
               "Time": 0,
               "powerflow.from_grid": 6,
               "powerflow.produced": 4,
-              "powerflow.produced4dc": 10,
               "powerflow.to_grid": 5,
-              "powerflow.to_grid4dc": 11,
               "smartmeter.from_grid": 9,
               "smartmeter.produced": 7,
-              "smartmeter.produced4dc": 12,
-              "smartmeter.to_grid": 8,
-              "smartmeter.to_grid4dc": 13
+              "smartmeter.to_grid": 8
             },
             "renameByName": {}
           }
@@ -6226,7 +6562,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 50
+        "y": 54
       },
       "id": 26,
       "options": {
@@ -6398,7 +6734,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 50
+        "y": 54
       },
       "id": 27,
       "options": {
@@ -6540,7 +6876,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 58
+        "y": 62
       },
       "id": 74,
       "libraryPanel": {
@@ -6599,7 +6935,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 64
+        "y": 68
       },
       "id": 81,
       "options": {
@@ -7180,7 +7516,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 64
+        "y": 68
       },
       "id": 103,
       "options": {
@@ -7716,7 +8052,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 77
+        "y": 81
       },
       "id": 37,
       "panels": [],
@@ -7786,7 +8122,7 @@
         "h": 5,
         "w": 8,
         "x": 0,
-        "y": 78
+        "y": 82
       },
       "id": 32,
       "interval": "",
@@ -7999,7 +8335,7 @@
         "h": 5,
         "w": 8,
         "x": 8,
-        "y": 78
+        "y": 82
       },
       "id": 62,
       "interval": "",
@@ -8232,7 +8568,7 @@
         "h": 5,
         "w": 8,
         "x": 16,
-        "y": 78
+        "y": 82
       },
       "id": 63,
       "interval": "",
@@ -8723,7 +9059,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 83
+        "y": 87
       },
       "id": 34,
       "interval": "",
@@ -8869,7 +9205,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 83
+        "y": 87
       },
       "id": 35,
       "interval": "",
@@ -9016,7 +9352,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 89
+        "y": 93
       },
       "id": 38,
       "interval": "",
@@ -9163,7 +9499,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 94
+        "y": 98
       },
       "id": 61,
       "interval": "",
@@ -9526,7 +9862,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 99
+        "y": 103
       },
       "id": 77,
       "interval": "",
@@ -9986,7 +10322,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 104
+        "y": 108
       },
       "id": 55,
       "options": {
@@ -10146,6 +10482,6 @@
   "timezone": "browser",
   "title": "Photovoltaik",
   "uid": "RSabAvRRzVz",
-  "version": 145,
+  "version": 164,
   "weekStart": ""
 }

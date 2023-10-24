@@ -110,13 +110,12 @@ Here are some screenshots of the dashboard:
 ![Autonomy](grafana/screenshots/autonomy.png)
 
 #### Detailed Analyses
-![Detailed analyses](grafana/screenshots/detailed_analyses.png)
-
-#### Daily Production Grouped by kW
-![Daily production grouped by kW](grafana/screenshots/daily_production_groupd_by_kw.png)
+![Detailed analyses](grafana/screenshots/detailed_analyses_1.png)
+![Detailed analyses](grafana/screenshots/detailed_analyses_2.png)
 
 #### Smart Meter
-![Smart meter](grafana/screenshots/smart_meter.png)
+![Smart meter](grafana/screenshots/smart_meter_1.png)
+![Smart meter](grafana/screenshots/smart_meter_2.png)
 
 ## Credits
 
