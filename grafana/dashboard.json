@@ -2986,6 +2986,351 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB_(INVERTER)}"
       },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 0,
+        "y": 24
+      },
+      "id": 9,
+      "interval": "",
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [],
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT max(\"EnergyReal_WAC_Plus_Absolute\") -  min(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Grid"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 3600"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_Grid::field",
+              "operator": ">",
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "title": "From Grid",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 3,
+        "y": 24
+      },
+      "id": 7,
+      "interval": "",
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [],
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT max(\"EnergyReal_WAC_Minus_Absolute\") -  min(\"EnergyReal_WAC_Minus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Grid"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 3600 * -1"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_Grid::field",
+              "operator": "<",
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "title": "To Grid",
+      "transformations": [
+        {
+          "id": "configFromData",
+          "options": {
+            "applyTo": {
+              "id": "byName",
+              "options": "smartmeter.max_min"
+            },
+            "configRefId": "A",
+            "mappings": [
+              {
+                "fieldName": "smartmeter.max_min",
+                "handlerKey": "displayName"
+              }
+            ]
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 6,
+        "y": 24
+      },
+      "id": 69,
+      "interval": "",
+      "links": [],
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [],
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT (last(\"EnergyReal_WAC_Plus_Absolute\") - first(\"EnergyReal_WAC_Plus_Absolute\")) - (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_Grid"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 3600"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Net Grid Usage",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
       "description": "comprises power sourced both from the battery and utilized directly",
       "fieldConfig": {
         "defaults": {
@@ -3011,7 +3356,7 @@
       "gridPos": {
         "h": 2,
         "w": 3,
-        "x": 0,
+        "x": 9,
         "y": 24
       },
       "id": 85,
@@ -3236,351 +3581,6 @@
           }
         }
       ],
-      "transparent": true,
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(INVERTER)}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 3,
-        "x": 3,
-        "y": 24
-      },
-      "id": 9,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 30
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [],
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "SELECT max(\"EnergyReal_WAC_Plus_Absolute\") -  min(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "P_Grid"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "P_Grid::field",
-              "operator": ">",
-              "value": "0"
-            }
-          ]
-        }
-      ],
-      "title": "From Grid",
-      "transparent": true,
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(INVERTER)}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 3,
-        "x": 6,
-        "y": 24
-      },
-      "id": 7,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 30
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [],
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "SELECT max(\"EnergyReal_WAC_Minus_Absolute\") -  min(\"EnergyReal_WAC_Minus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "P_Grid"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600 * -1"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "P_Grid::field",
-              "operator": "<",
-              "value": "0"
-            }
-          ]
-        }
-      ],
-      "title": "To Grid",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "applyTo": {
-              "id": "byName",
-              "options": "smartmeter.max_min"
-            },
-            "configRefId": "A",
-            "mappings": [
-              {
-                "fieldName": "smartmeter.max_min",
-                "handlerKey": "displayName"
-              }
-            ]
-          }
-        }
-      ],
-      "transparent": true,
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(INVERTER)}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 1,
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 3,
-        "x": 9,
-        "y": 24
-      },
-      "id": 69,
-      "interval": "",
-      "links": [],
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "text": {
-          "valueSize": 30
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.3",
-      "targets": [
-        {
-          "alias": "",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(INVERTER)}"
-          },
-          "groupBy": [],
-          "measurement": "powerflow",
-          "orderByTime": "ASC",
-          "policy": "autogen",
-          "query": "SELECT (last(\"EnergyReal_WAC_Plus_Absolute\") - first(\"EnergyReal_WAC_Plus_Absolute\")) - (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')\n",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "P_Grid"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": []
-        }
-      ],
-      "title": "Net Grid Usage",
       "transparent": true,
       "type": "stat"
     },
@@ -6961,7 +6961,7 @@
       },
       "targets": [
         {
-          "alias": "10kW",
+          "alias": ">10kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7010,7 +7010,7 @@
           ]
         },
         {
-          "alias": "9kW",
+          "alias": "9-10 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7060,7 +7060,7 @@
           ]
         },
         {
-          "alias": "8kW",
+          "alias": "8-9 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7110,7 +7110,7 @@
           ]
         },
         {
-          "alias": "7kW",
+          "alias": "7-8 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7160,7 +7160,7 @@
           ]
         },
         {
-          "alias": "6kW",
+          "alias": "6-7 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7210,7 +7210,7 @@
           ]
         },
         {
-          "alias": "5kW",
+          "alias": "5-6 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7260,7 +7260,7 @@
           ]
         },
         {
-          "alias": "4kW",
+          "alias": "4-5 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7310,7 +7310,7 @@
           ]
         },
         {
-          "alias": "3kW",
+          "alias": "3-4 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7360,7 +7360,7 @@
           ]
         },
         {
-          "alias": "2kW",
+          "alias": "2-3 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7410,7 +7410,57 @@
           ]
         },
         {
-          "alias": "1kW",
+          "alias": "1-2 kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 2000) AND  (\"P_PV\"::field >= 1000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "rawQuery": true,
+          "refId": "K",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "<1kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7542,7 +7592,7 @@
       },
       "targets": [
         {
-          "alias": "10kW",
+          "alias": ">10kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7564,7 +7614,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field >= 10000) AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field >= 10000) AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -7591,7 +7641,7 @@
           ]
         },
         {
-          "alias": "9kW",
+          "alias": "9-10 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7614,7 +7664,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 10000) AND  (\"P_PV\"::field >= 9000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 10000) AND  (\"P_PV\"::field >= 9000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "D",
           "resultFormat": "time_series",
@@ -7641,7 +7691,7 @@
           ]
         },
         {
-          "alias": "8kW",
+          "alias": "8-9 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7664,7 +7714,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 9000) AND  (\"P_PV\"::field >= 8000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 9000) AND  (\"P_PV\"::field >= 8000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series",
@@ -7691,7 +7741,7 @@
           ]
         },
         {
-          "alias": "7kW",
+          "alias": "7-8 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7714,7 +7764,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 8000) AND  (\"P_PV\"::field >= 7000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 8000) AND  (\"P_PV\"::field >= 7000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series",
@@ -7741,7 +7791,7 @@
           ]
         },
         {
-          "alias": "6kW",
+          "alias": "6-7 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7764,7 +7814,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 7000) AND  (\"P_PV\"::field >= 6000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 7000) AND  (\"P_PV\"::field >= 6000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "E",
           "resultFormat": "time_series",
@@ -7791,7 +7841,7 @@
           ]
         },
         {
-          "alias": "5kW",
+          "alias": "5-6 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7814,7 +7864,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 6000) AND  (\"P_PV\"::field >= 5000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 6000) AND  (\"P_PV\"::field >= 5000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "F",
           "resultFormat": "time_series",
@@ -7841,7 +7891,7 @@
           ]
         },
         {
-          "alias": "4kW",
+          "alias": "4-5 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7864,7 +7914,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 5000) AND  (\"P_PV\"::field >=4000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 5000) AND  (\"P_PV\"::field >=4000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "G",
           "resultFormat": "time_series",
@@ -7891,7 +7941,7 @@
           ]
         },
         {
-          "alias": "3kW",
+          "alias": "3-4 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7914,7 +7964,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 4000) AND  (\"P_PV\"::field >= 3000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 4000) AND  (\"P_PV\"::field >= 3000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "H",
           "resultFormat": "time_series",
@@ -7941,7 +7991,7 @@
           ]
         },
         {
-          "alias": "2kW",
+          "alias": "2-3 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -7964,7 +8014,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 3000) AND  (\"P_PV\"::field >= 2000)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 3000) AND  (\"P_PV\"::field >= 2000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "I",
           "resultFormat": "time_series",
@@ -7991,7 +8041,7 @@
           ]
         },
         {
-          "alias": "1kW",
+          "alias": "1-2 kW",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -8014,9 +8064,59 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 1000) AND  (\"P_PV\"::field >= 1)  AND $timeFilter GROUP BY time(50d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 2000) AND  (\"P_PV\"::field >= 1000)  AND $timeFilter tz('$tz')",
           "rawQuery": true,
           "refId": "J",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "P_PV"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "P_PV::field",
+              "operator": ">",
+              "value": "9000"
+            }
+          ]
+        },
+        {
+          "alias": "<1 kW",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "powerflow",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 1000) AND  (\"P_PV\"::field >= 1)  AND $timeFilter tz('$tz')",
+          "rawQuery": true,
+          "refId": "K",
           "resultFormat": "time_series",
           "select": [
             [
@@ -10482,6 +10582,6 @@
   "timezone": "browser",
   "title": "Photovoltaik",
   "uid": "RSabAvRRzVz",
-  "version": 164,
+  "version": 168,
   "weekStart": ""
 }
