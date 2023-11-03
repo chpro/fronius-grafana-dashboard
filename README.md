@@ -8,6 +8,9 @@ This README provides information on setting up and visualizing data from your Fr
   - Fronius JSON API (v1) enabled. For more details, refer to the [Fronius Solar API documentation](https://www.fronius.com/en/solar-energy/installers-partners/technical-data/all-products/system-monitoring/open-interfaces/fronius-solar-api-json-).
 - **Smart Meter**: TS 65A-3
   - Meter Location: 0 - Grid Interconnection Point (Primary Meter)
+- **Battery**: BYD HVS 5.12kwH
+
+> **_NOTE:_** All Grafana configurations related to minimum and maximum values align with this setup.
 
 ## Telegraf, Influx and Grafana Installation
 
@@ -73,9 +76,18 @@ The following Grafana plugins need to be installed:
 
 The following data sources need to be configured:
 
+#### InfluxDB
 - InfluxDB to the energyprices bucket
 - InfluxDB to the inverter bucket
 - InfluxDB to the pvforecast bucket
+
+> **_NOTE:_** The Query Language needs to be set to `InfluxQL`
+
+![Datasource example settings](grafana/screenshots/datasource_settings.png)
+
+> **_NOTE:_** To authorize access, use the Authorization header with the value Token YOUR_TOKEN. Replace YOUR_TOKEN with the token generated for InfluxDB access.
+
+#### Other
 - JSON API to your inverter with the endpoint [/status/powerflow](http://inverter/status/powerflow)
 - Sun and Moon for your latitude and longitude
 
