@@ -8,7 +8,7 @@ This README provides information on setting up and visualizing data from your Fr
   - Fronius JSON API (v1) enabled. For more details, refer to the [Fronius Solar API documentation](https://www.fronius.com/en/solar-energy/installers-partners/technical-data/all-products/system-monitoring/open-interfaces/fronius-solar-api-json-).
 - **Smart Meter**: TS 65A-3
   - Meter Location: 0 - Grid Interconnection Point (Primary Meter)
-- **Battery**: BYD HVS 5.12kwH
+- **Storage**: BYD HVS 5.1
 
 > **_NOTE:_** All Grafana configurations related to minimum and maximum values align with this setup.
 

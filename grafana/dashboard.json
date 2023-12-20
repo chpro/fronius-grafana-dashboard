@@ -464,6 +464,12 @@
             },
             "custom": {
               "fillOpacity": 70,
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
               "lineWidth": 0,
               "spanNulls": false
             },
@@ -711,7 +717,7 @@
             "measurement": "inverter",
             "orderByTime": "ASC",
             "policy": "autogen",
-            "query": "SELECT min(\"ErrorCode\") FROM \"autogen\".\"inverter\" WHERE $timeFilter GROUP BY time(5m) fill(-1) tz('$tz')",
+            "query": "SELECT min(\"ErrorCode\") FROM \"autogen\".\"inverter\" WHERE $timeFilter GROUP BY time(5m) fill(-1) tz('${tz:raw}')",
             "rawQuery": true,
             "refId": "A",
             "resultFormat": "time_series",
@@ -756,7 +762,7 @@
             "measurement": "inverter",
             "orderByTime": "ASC",
             "policy": "autogen",
-            "query": "SELECT min(\"StatusCode\") FROM \"autogen\".\"inverter\" WHERE $timeFilter GROUP BY time(5m) fill(-1) tz('$tz')",
+            "query": "SELECT min(\"StatusCode\") FROM \"autogen\".\"inverter\" WHERE $timeFilter GROUP BY time(5m) fill(-1) tz('${tz:raw}')",
             "rawQuery": true,
             "refId": "B",
             "resultFormat": "time_series",
@@ -801,7 +807,7 @@
             "measurement": "storage",
             "orderByTime": "ASC",
             "policy": "autogen",
-            "query": "SELECT min(\"Status_BatteryCell\") FROM \"autogen\".\"storage\" WHERE $timeFilter GROUP BY time(5m) fill(-1) tz('$tz')",
+            "query": "SELECT min(\"Status_BatteryCell\") FROM \"autogen\".\"storage\" WHERE $timeFilter GROUP BY time(5m) fill(-1) tz('${tz:raw}')",
             "rawQuery": true,
             "refId": "C",
             "resultFormat": "time_series",
@@ -1206,7 +1212,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "10.0.3"
+      "version": "10.2.3"
     },
     {
       "type": "datasource",
@@ -1292,6 +1298,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": true,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1305,6 +1312,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -1628,7 +1636,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT \"mean_load_instant_power\" FROM \"http\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT \"mean_load_instant_power\" FROM \"http\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": false,
           "refId": "Home Usage",
           "resultFormat": "time_series",
@@ -2060,8 +2068,8 @@
     {
       "gridPos": {
         "h": 11,
-        "w": 7,
-        "x": 17,
+        "w": 8,
+        "x": 16,
         "y": 1
       },
       "id": 76,
@@ -2072,9 +2080,9 @@
     },
     {
       "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 17,
+        "h": 3,
+        "w": 4,
+        "x": 16,
         "y": 12
       },
       "id": 105,
@@ -2178,7 +2186,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -2190,7 +2198,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -2299,10 +2307,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 17,
-        "y": 16
+        "h": 5,
+        "w": 4,
+        "x": 16,
+        "y": 15
       },
       "hideTimeOverride": true,
       "id": 101,
@@ -2310,7 +2318,7 @@
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
-        "orientation": "horizontal",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [],
           "fields": "",
@@ -2319,9 +2327,10 @@
         "text": {
           "valueSize": 20
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "alias": "Today",
@@ -2346,7 +2355,7 @@
           "measurement": "pv_forecast_watt_hours_day",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT first(\"value\") FROM \"autogen\".\"pv_forecast_watt_hours_day\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT first(\"value\") FROM \"autogen\".\"pv_forecast_watt_hours_day\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2374,7 +2383,7 @@
             "uid": "${DS_INFLUXDB_(PVFORECAST)}"
           },
           "hide": false,
-          "query": "SELECT last(\"value\") FROM \"autogen\".\"pv_forecast_watt_hours_day\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT last(\"value\") FROM \"autogen\".\"pv_forecast_watt_hours_day\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -2459,9 +2468,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -2472,7 +2482,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2508,7 +2518,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series",
@@ -2561,7 +2571,7 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB_(INVERTER)}"
       },
-      "description": "comprises power sourced both from the battery and utilized directly excluding energy feed into grid",
+      "description": "comprises power sourced both from the battery and utilized directly excluding energy from/to grid",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2615,9 +2625,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -2628,7 +2639,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2725,9 +2736,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -2738,7 +2750,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT last(\"E_Total\") - first(\"E_Total\") FROM \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT last(\"E_Total\") - first(\"E_Total\") FROM \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2820,9 +2832,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -2833,7 +2846,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT integral(\"P_Akku\") / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('$tz')",
+          "query": "SELECT integral(\"P_Akku\") / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2931,9 +2944,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -2944,7 +2958,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT abs(integral(\"P_Akku\")) / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field <= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('$tz')",
+          "query": "SELECT abs(integral(\"P_Akku\")) / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field <= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3039,9 +3053,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -3052,7 +3067,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT max(\"EnergyReal_WAC_Plus_Absolute\") -  min(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT max(\"EnergyReal_WAC_Plus_Absolute\") -  min(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3149,9 +3164,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -3162,7 +3178,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT max(\"EnergyReal_WAC_Minus_Absolute\") -  min(\"EnergyReal_WAC_Minus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT max(\"EnergyReal_WAC_Minus_Absolute\") -  min(\"EnergyReal_WAC_Minus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3281,9 +3297,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "alias": "",
@@ -3295,7 +3312,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT (last(\"EnergyReal_WAC_Plus_Absolute\") - first(\"EnergyReal_WAC_Plus_Absolute\")) - (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT (last(\"EnergyReal_WAC_Plus_Absolute\") - first(\"EnergyReal_WAC_Plus_Absolute\")) - (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3373,9 +3390,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "alias": "",
@@ -3401,7 +3419,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3452,7 +3470,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series",
@@ -3644,9 +3662,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -3793,9 +3812,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -3803,7 +3823,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')\n",
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -3814,7 +3834,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -3825,7 +3845,7 @@
             "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
           },
           "hide": false,
-          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('$tz')",
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -4061,9 +4081,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -4071,7 +4092,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')\n",
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -4082,7 +4103,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -4093,7 +4114,7 @@
             "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
           },
           "hide": false,
-          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('$tz')",
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -4330,9 +4351,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -4340,7 +4362,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')\n",
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -4351,7 +4373,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -4362,7 +4384,7 @@
             "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
           },
           "hide": false,
-          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('$tz')",
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -4599,9 +4621,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -4609,7 +4632,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')\n",
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -4620,7 +4643,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -4631,7 +4654,7 @@
             "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
           },
           "hide": false,
-          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('$tz')",
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -4869,9 +4892,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -4879,7 +4903,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')\n",
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -4890,7 +4914,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -4901,7 +4925,7 @@
             "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
           },
           "hide": false,
-          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('$tz')",
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -5139,9 +5163,10 @@
         "text": {
           "valueSize": 30
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.0.3",
+      "pluginVersion": "10.2.3",
       "targets": [
         {
           "datasource": {
@@ -5149,7 +5174,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" GROUP BY time(1d) fill(0) tz('$tz')\n",
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -5160,7 +5185,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" GROUP BY time(1d) fill(0)  tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" GROUP BY time(1d) fill(0)  tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -5171,7 +5196,7 @@
             "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
           },
           "hide": false,
-          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('$tz')",
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -5415,7 +5440,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -5427,7 +5452,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -5596,7 +5621,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -5608,7 +5633,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -5777,7 +5802,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -5789,7 +5814,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -5957,7 +5982,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('$tz')\n",
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -5969,7 +5994,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('$tz')",
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -6068,6 +6093,7 @@
             "mode": "fixed"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -6081,6 +6107,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 0,
             "pointSize": 5,
@@ -6156,7 +6183,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT last(E_Total) - first(E_Total) FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT last(E_Total) - first(E_Total) FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -6200,6 +6227,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -6213,6 +6241,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 0,
             "pointSize": 5,
@@ -6353,7 +6382,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')",
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -6387,7 +6416,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')",
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -6482,6 +6511,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -6495,6 +6525,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 0,
             "pointSize": 5,
@@ -6602,7 +6633,7 @@
           "measurement": "http",
           "orderByTime": "ASC",
           "policy": "kwh",
-          "query": "SELECT integral(\"P_Akku\")  / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field > 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('$tz')",
+          "query": "SELECT integral(\"P_Akku\")  / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -6630,7 +6661,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT integral(\"P_Akku\")  / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field < 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('$tz')",
+          "query": "SELECT integral(\"P_Akku\")  / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field <= 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -6652,6 +6683,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -6665,6 +6697,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 0,
             "pointSize": 5,
@@ -6775,7 +6808,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')",
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -6832,7 +6865,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('$tz')",
+          "query": "SELECT -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series",
@@ -6895,6 +6928,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -6983,7 +7017,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field >= 10000) AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field >= 10000) AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -7033,7 +7067,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 10000) AND  (\"P_PV\"::field >= 9000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 10000) AND  (\"P_PV\"::field >= 9000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "D",
           "resultFormat": "time_series",
@@ -7083,7 +7117,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 9000) AND  (\"P_PV\"::field >= 8000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 9000) AND  (\"P_PV\"::field >= 8000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series",
@@ -7133,7 +7167,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 8000) AND  (\"P_PV\"::field >= 7000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 8000) AND  (\"P_PV\"::field >= 7000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series",
@@ -7183,7 +7217,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 7000) AND  (\"P_PV\"::field >= 6000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 7000) AND  (\"P_PV\"::field >= 6000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "E",
           "resultFormat": "time_series",
@@ -7233,7 +7267,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 6000) AND  (\"P_PV\"::field >= 5000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 6000) AND  (\"P_PV\"::field >= 5000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "F",
           "resultFormat": "time_series",
@@ -7283,7 +7317,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 5000) AND  (\"P_PV\"::field >=4000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 5000) AND  (\"P_PV\"::field >=4000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "G",
           "resultFormat": "time_series",
@@ -7333,7 +7367,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 4000) AND  (\"P_PV\"::field >= 3000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 4000) AND  (\"P_PV\"::field >= 3000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "H",
           "resultFormat": "time_series",
@@ -7383,7 +7417,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 3000) AND  (\"P_PV\"::field >= 2000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 3000) AND  (\"P_PV\"::field >= 2000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "I",
           "resultFormat": "time_series",
@@ -7433,7 +7467,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 2000) AND  (\"P_PV\"::field >= 1000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 2000) AND  (\"P_PV\"::field >= 1000)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "K",
           "resultFormat": "time_series",
@@ -7483,7 +7517,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 1000) AND  (\"P_PV\"::field >= 1)  AND $timeFilter GROUP BY time(1d) fill(null) tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 1000) AND  (\"P_PV\"::field >= 1)  AND $timeFilter GROUP BY time(1d) fill(null) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "J",
           "resultFormat": "time_series",
@@ -7526,6 +7560,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -7614,7 +7649,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field >= 10000) AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field >= 10000) AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -7664,7 +7699,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 10000) AND  (\"P_PV\"::field >= 9000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 10000) AND  (\"P_PV\"::field >= 9000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "D",
           "resultFormat": "time_series",
@@ -7714,7 +7749,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 9000) AND  (\"P_PV\"::field >= 8000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 9000) AND  (\"P_PV\"::field >= 8000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series",
@@ -7764,7 +7799,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 8000) AND  (\"P_PV\"::field >= 7000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 8000) AND  (\"P_PV\"::field >= 7000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series",
@@ -7814,7 +7849,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 7000) AND  (\"P_PV\"::field >= 6000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 7000) AND  (\"P_PV\"::field >= 6000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "E",
           "resultFormat": "time_series",
@@ -7864,7 +7899,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 6000) AND  (\"P_PV\"::field >= 5000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 6000) AND  (\"P_PV\"::field >= 5000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "F",
           "resultFormat": "time_series",
@@ -7914,7 +7949,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 5000) AND  (\"P_PV\"::field >=4000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 5000) AND  (\"P_PV\"::field >=4000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "G",
           "resultFormat": "time_series",
@@ -7964,7 +7999,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 4000) AND  (\"P_PV\"::field >= 3000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 4000) AND  (\"P_PV\"::field >= 3000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "H",
           "resultFormat": "time_series",
@@ -8014,7 +8049,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 3000) AND  (\"P_PV\"::field >= 2000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 3000) AND  (\"P_PV\"::field >= 2000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "I",
           "resultFormat": "time_series",
@@ -8064,7 +8099,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 2000) AND  (\"P_PV\"::field >= 1000)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 2000) AND  (\"P_PV\"::field >= 1000)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "J",
           "resultFormat": "time_series",
@@ -8114,7 +8149,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 1000) AND  (\"P_PV\"::field >= 1)  AND $timeFilter tz('$tz')",
+          "query": "SELECT count(\"P_PV\") FROM \"autogen\".\"powerflow\" WHERE (\"P_PV\"::field < 1000) AND  (\"P_PV\"::field >= 1)  AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "K",
           "resultFormat": "time_series",
@@ -8170,6 +8205,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -8183,6 +8219,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -8383,6 +8420,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -8396,6 +8434,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -8600,6 +8639,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -8613,6 +8653,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -9091,6 +9132,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -9104,6 +9146,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -9238,6 +9281,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -9251,6 +9295,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -9385,6 +9430,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -9398,6 +9444,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -9532,6 +9579,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -9545,6 +9593,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -9895,6 +9944,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -9908,6 +9958,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -10258,6 +10309,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -10271,6 +10323,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -10533,8 +10586,7 @@
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 38,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
@@ -10582,6 +10634,6 @@
   "timezone": "browser",
   "title": "Photovoltaik",
   "uid": "RSabAvRRzVz",
-  "version": 168,
+  "version": 177,
   "weekStart": ""
 }
