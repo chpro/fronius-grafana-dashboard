@@ -85,7 +85,7 @@ The following data sources need to be configured:
 
 ![Datasource example settings](grafana/screenshots/datasource_settings.png)
 
-> **_NOTE:_** To authorize access, use the `Authorization` header with the value `Token YOUR_TOKEN`. Replace `YOUR_TOKEN` with the token generated for InfluxDB access.
+> **_NOTE:_** To authorize access, use the `Authorization` header with the value `Token YOUR_TOKEN`. Replace `YOUR_TOKEN` with the token generated for InfluxDB access ([InfluxDB v2 API documentation](https://docs.influxdata.com/influxdb/v2/api/#section/Authentication/TokenAuthentication)).
 
 #### Other
 - JSON API to your inverter with the endpoint [/status/powerflow](http://inverter/status/powerflow)
