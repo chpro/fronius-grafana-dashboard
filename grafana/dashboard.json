@@ -216,6 +216,8 @@
           ]
         },
         "options": {
+          "minVizHeight": 75,
+          "minVizWidth": 75,
           "orientation": "auto",
           "reduceOptions": {
             "calcs": [
@@ -226,11 +228,12 @@
           },
           "showThresholdLabels": false,
           "showThresholdMarkers": true,
+          "sizing": "auto",
           "text": {
             "valueSize": 20
           }
         },
-        "pluginVersion": "10.0.3",
+        "pluginVersion": "11.4.0",
         "targets": [
           {
             "cacheDurationSeconds": 0,
@@ -240,26 +243,26 @@
             },
             "fields": [
               {
-                "jsonPath": "$.site.P_PV",
+                "jsonPath": "$.Body.Data.Site.P_PV",
                 "name": "Solar Energy"
               },
               {
-                "jsonPath": "$.site.P_Load",
+                "jsonPath": "$.Body.Data.Site.P_Load",
                 "language": "jsonpath",
                 "name": "Home Usage"
               },
               {
-                "jsonPath": "$.site.P_Grid",
+                "jsonPath": "$.Body.Data.Site.P_Grid",
                 "language": "jsonpath",
                 "name": "Grid Usage"
               },
               {
-                "jsonPath": "$.site.P_Akku",
+                "jsonPath": "$.Body.Data.Site.P_Akku",
                 "language": "jsonpath",
                 "name": "Storage"
               },
               {
-                "jsonPath": "$.inverters[0].SOC",
+                "jsonPath": "$.Body.Data.Inverters[\"1\"].SOC",
                 "language": "jsonpath",
                 "name": "Charge"
               }
@@ -272,178 +275,6 @@
         ],
         "title": "Power flow",
         "type": "gauge"
-      }
-    },
-    "e7006c4d-5436-4fb5-b22a-806f657dd36d": {
-      "name": "Power flow text",
-      "uid": "e7006c4d-5436-4fb5-b22a-806f657dd36d",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "marcusolsson-json-datasource",
-          "uid": "${DS_INVERTER_STATUS POWER FLOW}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "thresholds"
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "blue",
-                  "value": null
-                }
-              ]
-            },
-            "unit": "watt"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Battery"
-              },
-              "properties": [
-                {
-                  "id": "mappings",
-                  "value": [
-                    {
-                      "options": {
-                        "from": -1,
-                        "result": {
-                          "color": "text",
-                          "index": 0,
-                          "text": "Idle"
-                        },
-                        "to": 1
-                      },
-                      "type": "range"
-                    },
-                    {
-                      "options": {
-                        "from": -20000,
-                        "result": {
-                          "color": "super-light-purple",
-                          "index": 1,
-                          "text": "Charging"
-                        },
-                        "to": -1
-                      },
-                      "type": "range"
-                    },
-                    {
-                      "options": {
-                        "from": 1,
-                        "result": {
-                          "color": "dark-purple",
-                          "index": 2,
-                          "text": "Discharging"
-                        },
-                        "to": 20000
-                      },
-                      "type": "range"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Grid"
-              },
-              "properties": [
-                {
-                  "id": "mappings",
-                  "value": [
-                    {
-                      "options": {
-                        "from": -20000,
-                        "result": {
-                          "color": "green",
-                          "index": 0,
-                          "text": "Feeding in"
-                        },
-                        "to": -50
-                      },
-                      "type": "range"
-                    },
-                    {
-                      "options": {
-                        "from": 50,
-                        "result": {
-                          "color": "red",
-                          "index": 1,
-                          "text": "Consuming"
-                        },
-                        "to": 20000
-                      },
-                      "type": "range"
-                    },
-                    {
-                      "options": {
-                        "from": -50,
-                        "result": {
-                          "color": "text",
-                          "index": 2,
-                          "text": "Idle"
-                        },
-                        "to": 50
-                      },
-                      "type": "range"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        "options": {
-          "colorMode": "value",
-          "graphMode": "area",
-          "justifyMode": "auto",
-          "orientation": "auto",
-          "reduceOptions": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": "",
-            "values": false
-          },
-          "text": {},
-          "textMode": "auto"
-        },
-        "pluginVersion": "10.0.3",
-        "targets": [
-          {
-            "cacheDurationSeconds": 0,
-            "datasource": {
-              "type": "marcusolsson-json-datasource",
-              "uid": "c22db054-79a4-46c1-a749-9a7556a2a4b1"
-            },
-            "fields": [
-              {
-                "jsonPath": "$.site.P_Akku",
-                "language": "jsonpath",
-                "name": "Battery"
-              },
-              {
-                "jsonPath": "$.site.P_Grid",
-                "language": "jsonpath",
-                "name": "Grid"
-              }
-            ],
-            "method": "GET",
-            "queryParams": "",
-            "refId": "A",
-            "urlPath": ""
-          }
-        ],
-        "type": "stat"
       }
     },
     "XB8yzeRgk": {
@@ -588,6 +419,16 @@
                           "index": 2,
                           "text": "AC voltage too high"
                         },
+                        "1117": {
+                          "color": "red",
+                          "index": 8,
+                          "text": "Long-term mains voltage limit exceeded"
+                        },
+                        "1118": {
+                          "color": "red",
+                          "index": 9,
+                          "text": "Permissible reconnection voltage of the inverter exceeded"
+                        },
                         "1119": {
                           "color": "red",
                           "index": 3,
@@ -688,6 +529,7 @@
           "rowHeight": 0.9,
           "showValue": "auto",
           "tooltip": {
+            "maxHeight": 600,
             "mode": "single",
             "sort": "none"
           }
@@ -831,6 +673,181 @@
         "title": "Inverter Status",
         "transparent": true,
         "type": "state-timeline"
+      }
+    },
+    "e7006c4d-5436-4fb5-b22a-806f657dd36d": {
+      "name": "Power flow text",
+      "uid": "e7006c4d-5436-4fb5-b22a-806f657dd36d",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "${DS_INVERTER_STATUS POWER FLOW}"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "watt"
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Battery"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "from": -50,
+                        "result": {
+                          "color": "text",
+                          "index": 0,
+                          "text": "Idle"
+                        },
+                        "to": 50
+                      },
+                      "type": "range"
+                    },
+                    {
+                      "options": {
+                        "from": -20000,
+                        "result": {
+                          "color": "super-light-purple",
+                          "index": 1,
+                          "text": "Charging"
+                        },
+                        "to": -50
+                      },
+                      "type": "range"
+                    },
+                    {
+                      "options": {
+                        "from": 50,
+                        "result": {
+                          "color": "dark-purple",
+                          "index": 2,
+                          "text": "Discharging"
+                        },
+                        "to": 20000
+                      },
+                      "type": "range"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Grid"
+              },
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "from": -20000,
+                        "result": {
+                          "color": "green",
+                          "index": 0,
+                          "text": "Feeding in"
+                        },
+                        "to": -50
+                      },
+                      "type": "range"
+                    },
+                    {
+                      "options": {
+                        "from": 50,
+                        "result": {
+                          "color": "red",
+                          "index": 1,
+                          "text": "Consuming"
+                        },
+                        "to": 20000
+                      },
+                      "type": "range"
+                    },
+                    {
+                      "options": {
+                        "from": -50,
+                        "result": {
+                          "color": "text",
+                          "index": 2,
+                          "text": "Idle"
+                        },
+                        "to": 50
+                      },
+                      "type": "range"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "text": {},
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.4.0",
+        "targets": [
+          {
+            "cacheDurationSeconds": 0,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "c22db054-79a4-46c1-a749-9a7556a2a4b1"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.Body.Data.Site.P_Akku",
+                "language": "jsonpath",
+                "name": "Battery"
+              },
+              {
+                "jsonPath": "$.Body.Data.Site.P_Grid",
+                "language": "jsonpath",
+                "name": "Grid"
+              }
+            ],
+            "method": "GET",
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": ""
+          }
+        ],
+        "type": "stat"
       }
     },
     "urTr7ciRk": {
@@ -1214,7 +1231,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "10.2.3"
+      "version": "11.4.0"
     },
     {
       "type": "datasource",
@@ -1226,7 +1243,7 @@
       "type": "datasource",
       "id": "marcusolsson-json-datasource",
       "name": "JSON API",
-      "version": "1.3.6"
+      "version": "1.3.12"
     },
     {
       "type": "panel",
@@ -1274,7 +1291,6 @@
   "graphTooltip": 0,
   "id": null,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
@@ -1306,6 +1322,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 30,
             "gradientMode": "none",
@@ -1594,13 +1611,12 @@
         ]
       },
       "gridPos": {
-        "h": 14,
+        "h": 17,
         "w": 16,
         "x": 0,
         "y": 1
       },
       "id": 2,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [],
@@ -1609,11 +1625,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "Home Usage",
@@ -2081,19 +2098,6 @@
       }
     },
     {
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 16,
-        "y": 12
-      },
-      "id": 105,
-      "libraryPanel": {
-        "uid": "e7006c4d-5436-4fb5-b22a-806f657dd36d",
-        "name": "Power flow text"
-      }
-    },
-    {
       "datasource": {
         "type": "influxdb",
         "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -2151,7 +2155,7 @@
       "gridPos": {
         "h": 8,
         "w": 4,
-        "x": 20,
+        "x": 16,
         "y": 12
       },
       "id": 87,
@@ -2176,11 +2180,12 @@
           "values": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -2272,11 +2277,206 @@
       "type": "piechart"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 20,
+        "y": 12
+      },
+      "id": 107,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Self consumption",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "right": "-1"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "From Grid": true,
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "From Grid": 2,
+              "Local Energy Consumption": 1,
+              "Time": 0,
+              "powerflow.produced": 3,
+              "powerflow.to_grid": 4,
+              "smartmeter.produced": 5,
+              "smartmeter.to_grid": 6,
+              "smartmeter.to_grid * -1": 7
+            },
+            "renameByName": {
+              "Local Energy Consumption": "",
+              "smartmeter.to_grid * -1": "To Grid"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
       "gridPos": {
         "h": 6,
         "w": 16,
         "x": 0,
-        "y": 15
+        "y": 18
       },
       "id": 72,
       "libraryPanel": {
@@ -2309,10 +2509,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 4,
         "x": 16,
-        "y": 15
+        "y": 20
       },
       "hideTimeOverride": true,
       "id": 101,
@@ -2321,18 +2521,20 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [],
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 20
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "Today",
@@ -2394,8 +2596,20 @@
       "timeFrom": "+1d/d",
       "timeShift": "0d/d",
       "title": "Expected yield",
-      "transparent": true,
       "type": "stat"
+    },
+    {
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 20
+      },
+      "id": 105,
+      "libraryPanel": {
+        "uid": "e7006c4d-5436-4fb5-b22a-806f657dd36d",
+        "name": "Power flow text"
+      }
     },
     {
       "collapsed": false,
@@ -2403,7 +2617,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 24
       },
       "id": 41,
       "panels": [],
@@ -2449,17 +2663,16 @@
         "h": 2,
         "w": 3,
         "x": 0,
-        "y": 22
+        "y": 25
       },
       "id": 4,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -2467,13 +2680,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -2608,29 +2822,29 @@
         "h": 2,
         "w": 3,
         "x": 3,
-        "y": 22
+        "y": 25
       },
       "id": 78,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [],
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -2719,29 +2933,29 @@
         "h": 2,
         "w": 3,
         "x": 6,
-        "y": 22
+        "y": 25
       },
       "id": 5,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [],
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -2779,6 +2993,7 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB_(INVERTER)}"
       },
+      "description": "This is an approximation as it requires calculation using an integral function, since no value in the API accurately reflects the actual value.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2813,17 +3028,16 @@
         "h": 2,
         "w": 3,
         "x": 9,
-        "y": 22
+        "y": 25
       },
       "id": 6,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -2831,13 +3045,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -2848,7 +3063,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT integral(\"P_Akku\") / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('${tz:raw}')",
+          "query": "SELECT integral(\"P_Akku\", 1h) FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2891,6 +3106,7 @@
         "type": "influxdb",
         "uid": "${DS_INFLUXDB_(INVERTER)}"
       },
+      "description": "This is an approximation as it requires calculation using an integral function, since no value in the API accurately reflects the actual value.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2925,17 +3141,16 @@
         "h": 2,
         "w": 3,
         "x": 12,
-        "y": 22
+        "y": 25
       },
       "id": 8,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -2943,13 +3158,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -2960,7 +3176,7 @@
           "measurement": "powerflow",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT abs(integral(\"P_Akku\")) / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field <= 0) AND $timeFilter GROUP BY time(1s) fill(0) tz('${tz:raw}')",
+          "query": "SELECT abs(integral(\"P_Akku\", 1h)) FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field <= 0) AND $timeFilter tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -3036,29 +3252,29 @@
         "h": 2,
         "w": 3,
         "x": 0,
-        "y": 24
+        "y": 27
       },
       "id": 9,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [],
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -3145,17 +3361,16 @@
         "h": 2,
         "w": 3,
         "x": 3,
-        "y": 24
+        "y": 27
       },
       "id": 7,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -3163,13 +3378,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -3278,17 +3494,16 @@
         "h": 2,
         "w": 3,
         "x": 6,
-        "y": 24
+        "y": 27
       },
       "id": 69,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -3296,13 +3511,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "",
@@ -3376,7 +3592,7 @@
         "h": 2,
         "w": 3,
         "x": 9,
-        "y": 24
+        "y": 27
       },
       "id": 85,
       "options": {
@@ -3384,18 +3600,20 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [],
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "",
@@ -3643,17 +3861,16 @@
         "h": 3,
         "w": 3,
         "x": 12,
-        "y": 24
+        "y": 27
       },
       "id": 79,
-      "interval": "",
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -3661,13 +3878,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -3706,7 +3924,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 27
+        "y": 30
       },
       "id": 80,
       "panels": [],
@@ -3731,7 +3949,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -3793,17 +4012,15 @@
         "h": 8,
         "w": 4,
         "x": 0,
-        "y": 28
+        "y": 31
       },
-      "hideTimeOverride": true,
       "id": 97,
-      "interval": "",
-      "links": [],
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -3811,13 +4028,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -4000,7 +4218,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -4062,17 +4281,16 @@
         "h": 8,
         "w": 4,
         "x": 4,
-        "y": 28
+        "y": 31
       },
       "hideTimeOverride": true,
       "id": 98,
-      "interval": "",
-      "links": [],
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -4080,13 +4298,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -4270,7 +4489,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -4332,17 +4552,16 @@
         "h": 8,
         "w": 4,
         "x": 8,
-        "y": 28
+        "y": 31
       },
       "hideTimeOverride": true,
       "id": 104,
-      "interval": "",
-      "links": [],
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -4350,13 +4569,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -4540,7 +4760,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -4602,17 +4823,16 @@
         "h": 8,
         "w": 4,
         "x": 12,
-        "y": 28
+        "y": 31
       },
       "hideTimeOverride": true,
       "id": 99,
-      "interval": "",
-      "links": [],
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -4620,13 +4840,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -4811,7 +5032,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -4873,17 +5095,16 @@
         "h": 8,
         "w": 4,
         "x": 16,
-        "y": 28
+        "y": 31
       },
       "hideTimeOverride": true,
       "id": 100,
-      "interval": "",
-      "links": [],
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -4891,13 +5112,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -5082,7 +5304,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -5144,17 +5367,15 @@
         "h": 8,
         "w": 4,
         "x": 20,
-        "y": 28
+        "y": 31
       },
-      "hideTimeOverride": true,
       "id": 102,
-      "interval": "",
-      "links": [],
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -5162,13 +5383,14 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "text": {
           "valueSize": 30
         },
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -5339,7 +5561,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 39
       },
       "id": 89,
       "panels": [],
@@ -5403,9 +5625,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 5,
+        "w": 4,
         "x": 0,
-        "y": 37
+        "y": 40
       },
       "hideTimeOverride": true,
       "id": 82,
@@ -5430,11 +5652,12 @@
           "values": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -5584,9 +5807,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 5,
-        "x": 5,
-        "y": 37
+        "w": 4,
+        "x": 4,
+        "y": 40
       },
       "hideTimeOverride": true,
       "id": 86,
@@ -5611,11 +5834,194 @@
           "values": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "timeFrom": "0M/M",
+      "timeShift": "0M/M",
+      "title": "Autonomy this month",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "indexByName": {
+              "Directly Consumed": 2,
+              "From Grid": 3,
+              "Home Usage": 1,
+              "Time": 0,
+              "powerflow.from_grid": 6,
+              "powerflow.produced": 4,
+              "powerflow.produced4dc": 10,
+              "powerflow.to_grid": 5,
+              "powerflow.to_grid4dc": 11,
+              "smartmeter.from_grid": 9,
+              "smartmeter.produced": 7,
+              "smartmeter.produced4dc": 12,
+              "smartmeter.to_grid": 8,
+              "smartmeter.to_grid4dc": 13
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 8,
+        "y": 40
+      },
+      "hideTimeOverride": true,
+      "id": 106,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -5765,9 +6171,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 5,
-        "x": 10,
-        "y": 37
+        "w": 4,
+        "x": 12,
+        "y": 40
       },
       "hideTimeOverride": true,
       "id": 88,
@@ -5792,11 +6198,12 @@
           "values": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -5945,9 +6352,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 5,
-        "x": 15,
-        "y": 37
+        "w": 4,
+        "x": 16,
+        "y": 40
       },
       "hideTimeOverride": true,
       "id": 92,
@@ -5972,11 +6379,12 @@
           "values": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "datasource": {
@@ -6070,12 +6478,1001 @@
       "type": "piechart"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 48
+      },
+      "hideTimeOverride": true,
+      "id": 108,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "timeFrom": "0d/d",
+      "timeShift": "1d/d",
+      "title": "Self consumption yesterday",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "right": "-1"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "From Grid": true,
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "From Grid": 2,
+              "Local Energy Consumption": 1,
+              "Time": 0,
+              "powerflow.produced": 3,
+              "powerflow.to_grid": 4,
+              "smartmeter.produced": 5,
+              "smartmeter.to_grid": 6,
+              "smartmeter.to_grid * -1": 7
+            },
+            "renameByName": {
+              "Local Energy Consumption": "",
+              "smartmeter.to_grid * -1": "To Grid"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 4,
+        "y": 48
+      },
+      "hideTimeOverride": true,
+      "id": 109,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "timeFrom": "0M/M",
+      "timeShift": "0M/M",
+      "title": "Self consumption this month",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "right": "-1"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "From Grid": true,
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "From Grid": 2,
+              "Local Energy Consumption": 1,
+              "Time": 0,
+              "powerflow.produced": 3,
+              "powerflow.to_grid": 4,
+              "smartmeter.produced": 5,
+              "smartmeter.to_grid": 6,
+              "smartmeter.to_grid * -1": 7
+            },
+            "renameByName": {
+              "Local Energy Consumption": "",
+              "smartmeter.to_grid * -1": "To Grid"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 8,
+        "y": 48
+      },
+      "hideTimeOverride": true,
+      "id": 110,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "timeFrom": "0M/M",
+      "timeShift": "1M/M",
+      "title": "Self consumption last month",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "right": "-1"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "From Grid": true,
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "From Grid": 2,
+              "Local Energy Consumption": 1,
+              "Time": 0,
+              "powerflow.produced": 3,
+              "powerflow.to_grid": 4,
+              "smartmeter.produced": 5,
+              "smartmeter.to_grid": 6,
+              "smartmeter.to_grid * -1": 7
+            },
+            "renameByName": {
+              "Local Energy Consumption": "",
+              "smartmeter.to_grid * -1": "To Grid"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 12,
+        "y": 48
+      },
+      "hideTimeOverride": true,
+      "id": 111,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "timeFrom": "0y/y",
+      "title": "Self consumption this year",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "right": "-1"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "From Grid": true,
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "From Grid": 2,
+              "Local Energy Consumption": 1,
+              "Time": 0,
+              "powerflow.produced": 3,
+              "powerflow.to_grid": 4,
+              "smartmeter.produced": 5,
+              "smartmeter.to_grid": 6,
+              "smartmeter.to_grid * -1": 7
+            },
+            "renameByName": {
+              "Local Energy Consumption": "",
+              "smartmeter.to_grid * -1": "To Grid"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 16,
+        "y": 48
+      },
+      "hideTimeOverride": true,
+      "id": 112,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "timeFrom": "0y/y",
+      "timeShift": "1y/y",
+      "title": "Self consumption last year",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "smartmeter.to_grid",
+              "operator": "*",
+              "right": "-1"
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "From Grid": true,
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "From Grid": 2,
+              "Local Energy Consumption": 1,
+              "Time": 0,
+              "powerflow.produced": 3,
+              "powerflow.to_grid": 4,
+              "smartmeter.produced": 5,
+              "smartmeter.to_grid": 6,
+              "smartmeter.to_grid * -1": 7
+            },
+            "renameByName": {
+              "Local Energy Consumption": "",
+              "smartmeter.to_grid * -1": "To Grid"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 45
+        "y": 56
       },
       "id": 22,
       "panels": [],
@@ -6101,6 +7498,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "bars",
             "fillOpacity": 100,
             "gradientMode": "none",
@@ -6133,7 +7531,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "yellow"
+                "color": "yellow",
+                "value": null
               }
             ]
           },
@@ -6145,7 +7544,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 46
+        "y": 57
       },
       "id": 25,
       "options": {
@@ -6156,11 +7555,12 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "Local Energy Production",
@@ -6235,6 +7635,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "bars",
             "fillOpacity": 100,
             "gradientMode": "none",
@@ -6267,7 +7668,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -6343,7 +7745,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 46
+        "y": 57
       },
       "id": 24,
       "options": {
@@ -6354,11 +7756,12 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "",
@@ -6519,6 +7922,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "bars",
             "fillOpacity": 100,
             "gradientMode": "none",
@@ -6552,7 +7956,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -6595,7 +8000,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 54
+        "y": 65
       },
       "id": 26,
       "options": {
@@ -6606,11 +8011,12 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "From Storage",
@@ -6635,7 +8041,7 @@
           "measurement": "http",
           "orderByTime": "ASC",
           "policy": "kwh",
-          "query": "SELECT integral(\"P_Akku\")  / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
+          "query": "SELECT integral(\"P_Akku\", 1h) FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field >= 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -6663,7 +8069,7 @@
             "uid": "${DS_INFLUXDB_(INVERTER)}"
           },
           "hide": false,
-          "query": "SELECT integral(\"P_Akku\")  / 3600 FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field <= 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
+          "query": "SELECT integral(\"P_Akku\", 1h) FROM \"autogen\".\"powerflow\" WHERE (\"P_Akku\"::field <= 0) AND $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -6691,6 +8097,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "bars",
             "fillOpacity": 100,
             "gradientMode": "none",
@@ -6722,7 +8129,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -6769,7 +8177,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 54
+        "y": 65
       },
       "id": 27,
       "options": {
@@ -6780,11 +8188,12 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "From Grid",
@@ -6911,7 +8320,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 62
+        "y": 73
       },
       "id": 74,
       "libraryPanel": {
@@ -6955,7 +8364,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -6971,7 +8381,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 68
+        "y": 79
       },
       "id": 81,
       "options": {
@@ -6995,6 +8405,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": ">10kW",
@@ -7587,7 +8998,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -7603,7 +9015,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 68
+        "y": 79
       },
       "id": 103,
       "options": {
@@ -7627,6 +9039,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": ">10kW",
@@ -8189,7 +9602,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 81
+        "y": 92
       },
       "id": 37,
       "panels": [],
@@ -8213,6 +9626,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -8240,12 +9654,12 @@
           },
           "links": [],
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -8261,10 +9675,9 @@
         "h": 5,
         "w": 8,
         "x": 0,
-        "y": 82
+        "y": 93
       },
       "id": 32,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [
@@ -8279,7 +9692,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "L1",
@@ -8428,6 +9841,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -8460,7 +9874,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -8476,10 +9891,9 @@
         "h": 5,
         "w": 8,
         "x": 8,
-        "y": 82
+        "y": 93
       },
       "id": 62,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [
@@ -8494,7 +9908,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "P1",
@@ -8647,6 +10061,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -8679,7 +10094,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -8711,10 +10127,9 @@
         "h": 5,
         "w": 8,
         "x": 16,
-        "y": 82
+        "y": 93
       },
       "id": 63,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [
@@ -8729,7 +10144,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "Apparent S P1",
@@ -9140,6 +10555,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -9172,7 +10588,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -9204,10 +10621,9 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 87
+        "y": 98
       },
       "id": 34,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [
@@ -9222,7 +10638,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "Power AC",
@@ -9289,6 +10705,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -9320,7 +10737,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -9352,10 +10770,9 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 87
+        "y": 98
       },
       "id": 35,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [
@@ -9371,7 +10788,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "Temperature",
@@ -9438,6 +10855,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -9469,7 +10887,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -9501,10 +10920,9 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 93
+        "y": 104
       },
       "id": 38,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [
@@ -9520,7 +10938,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "Frequency",
@@ -9587,6 +11005,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -9618,7 +11037,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -9650,10 +11070,9 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 98
+        "y": 109
       },
       "id": 61,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [
@@ -9669,7 +11088,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "11.4.0",
       "targets": [
         {
           "alias": "AC L1",
@@ -10015,10 +11434,9 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 103
+        "y": 114
       },
       "id": 77,
-      "interval": "",
       "options": {
         "legend": {
           "calcs": [
@@ -10477,7 +11895,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 108
+        "y": 119
       },
       "id": 55,
       "options": {
@@ -10588,7 +12006,7 @@
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 39,
+  "schemaVersion": 40,
   "tags": [],
   "templating": {
     "list": [
@@ -10598,7 +12016,7 @@
         "label": "Timezone",
         "name": "tz",
         "query": "${VAR_TZ}",
-        "skipUrlSync": false,
+        "skipUrlSync": true,
         "type": "constant",
         "current": {
           "value": "${VAR_TZ}",
@@ -10616,26 +12034,13 @@
     ]
   },
   "time": {
-    "from": "now-0d/d",
+    "from": "now/d",
     "to": "now"
   },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ]
-  },
+  "timepicker": {},
   "timezone": "browser",
   "title": "Photovoltaik",
   "uid": "RSabAvRRzVz",
-  "version": 177,
+  "version": 192,
   "weekStart": ""
 }

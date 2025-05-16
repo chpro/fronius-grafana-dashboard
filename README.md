@@ -4,7 +4,7 @@ This README provides information on setting up and visualizing data from your Fr
 
 ## Fronius Setup
 
-- **Inverter**: Symo GEN24 10.0
+- **Inverter**: Symo GEN24 10.0 (Fírmware >= ROW 1.36.6-1)
   - Fronius JSON API (v1) enabled. For more details, refer to the [Fronius Solar API documentation](https://www.fronius.com/en/solar-energy/installers-partners/technical-data/all-products/system-monitoring/open-interfaces/fronius-solar-api-json-).
 - **Smart Meter**: TS 65A-3
   - Meter Location: 0 - Grid Interconnection Point (Primary Meter)
@@ -90,7 +90,7 @@ The following data sources need to be configured:
 > **_NOTE:_** After configuring connections, you might come across a 'database not found' error in Grafana. To resolve this, you can map InfluxDB v2 buckets to InfluxDB v1 databases by following the instructions provided in [Setting up InfluxDB v2 (Flux) with InfluxQL in Grafana](https://ivanahuckova.medium.com/setting-up-influxdb-v2-flux-with-influxql-in-grafana-926599a19eeb). To obtain the bucket IDs, use the command `influx bucket list`. More details can also be found on official Influx DB website [Query data with InfluxQL](https://docs.influxdata.com/influxdb/v2/query-data/influxql/)
 
 #### Other
-- JSON API to your inverter with the endpoint [/status/powerflow](http://inverter/status/powerflow)
+- JSON API to your inverter with the endpoint [/solar_api/v1/GetPowerFlowRealtimeData.fcgi](http://inverter/solar_api/v1/GetPowerFlowRealtimeData.fcgi)
 - Sun and Moon for your latitude and longitude
 
 > **_NOTE:_** The IP Address of the Symo GEN24 10.0 is in my network resolved by hostname `inverter`. Either you configure your network the same way or change the IP address in the JSON API datasource accordingly.
@@ -107,29 +107,9 @@ To import the dashboard, download the file and follow these steps:
 
 By default, the dashboard shows the current day and is refreshed every 5 seconds. The short refresh time was selected because the `Power flow` panel uses JSON API to show the most recent values and is not restricted to a time interval of data in InfluxDB.
 
-### Screenshots
+### Screenshot
 
-Here are some screenshots of the dashboard:
-
-#### Live Monitoring
-![Live monitoring](grafana/screenshots/live_monitoring.png)
-
-#### Energy Meters
-![Energy meters](grafana/screenshots/energy_meters.png)
-
-#### Estimated Savings
-![Estimated savings](grafana/screenshots/estimated_savings.png)
-
-#### Autonomy
-![Autonomy](grafana/screenshots/autonomy.png)
-
-#### Detailed Analyses
-![Detailed analyses](grafana/screenshots/detailed_analyses_1.png)
-![Detailed analyses](grafana/screenshots/detailed_analyses_2.png)
-
-#### Smart Meter
-![Smart meter](grafana/screenshots/smart_meter_1.png)
-![Smart meter](grafana/screenshots/smart_meter_2.png)
+![Dashboard](grafana/screenshots/dashboard.png)
 
 ## Credits
 
