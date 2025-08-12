@@ -41,14 +41,6 @@
       "pluginName": "Infinity"
     },
     {
-      "name": "DS_INVERTER_STATUS POWER FLOW",
-      "label": "Inverter status power flow",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "marcusolsson-json-datasource",
-      "pluginName": "JSON API"
-    },
-    {
       "name": "VAR_TZ",
       "type": "constant",
       "label": "Timezone",
@@ -715,8 +707,8 @@
       "kind": 1,
       "model": {
         "datasource": {
-          "type": "marcusolsson-json-datasource",
-          "uid": "${DS_INVERTER_STATUS POWER FLOW}"
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "${DS_INFINITY-DATASOURCE-NO-CONF}"
         },
         "description": "",
         "fieldConfig": {
@@ -855,30 +847,38 @@
           "textMode": "auto",
           "wideLayout": true
         },
-        "pluginVersion": "11.4.0",
+        "pluginVersion": "12.1.0",
         "targets": [
           {
-            "cacheDurationSeconds": 0,
-            "datasource": {
-              "type": "marcusolsson-json-datasource",
-              "uid": "c22db054-79a4-46c1-a749-9a7556a2a4b1"
-            },
-            "fields": [
+            "columns": [
               {
-                "jsonPath": "$.Body.Data.Site.P_Akku",
-                "language": "jsonpath",
-                "name": "Battery"
+                "selector": "Site.P_Grid",
+                "text": "Grid",
+                "type": "number"
               },
               {
-                "jsonPath": "$.Body.Data.Site.P_Grid",
-                "language": "jsonpath",
-                "name": "Grid"
+                "selector": "Site.P_Akku",
+                "text": "Battery",
+                "type": "number"
               }
             ],
-            "method": "GET",
-            "queryParams": "",
+            "datasource": {
+              "type": "yesoreyeram-infinity-datasource",
+              "uid": "ee1mwywv3gv0gf"
+            },
+            "filters": [],
+            "format": "table",
+            "global_query_id": "",
+            "parser": "backend",
             "refId": "A",
-            "urlPath": ""
+            "root_selector": "$.Body.Data",
+            "source": "url",
+            "type": "json",
+            "url": "http://inverter/solar_api/v1/GetPowerFlowRealtimeData.fcgi",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
           }
         ],
         "type": "stat"
@@ -1272,12 +1272,6 @@
       "id": "influxdb",
       "name": "InfluxDB",
       "version": "1.0.0"
-    },
-    {
-      "type": "datasource",
-      "id": "marcusolsson-json-datasource",
-      "name": "JSON API",
-      "version": "1.3.24"
     },
     {
       "type": "panel",
