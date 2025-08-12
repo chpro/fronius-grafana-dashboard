@@ -1,5 +1,7 @@
 # Data Visualization for Fronius
 
+**Disclaimer:** This project is intended for advanced users who are comfortable with data visualization and Fronius systems. No support or warranty is provided. Use at your own risk.
+
 This README provides information on setting up and visualizing data from your Fronius Symo GEN24 10.0 inverter and Smart Meter TS 65A-3 using InfluxDB and Grafana.
 
 ## Fronius Setup
@@ -69,7 +71,7 @@ Energy prices need to be available to calculate savings. Please note that the ac
 
 The following Grafana plugins need to be installed:
 
-- [JSON API by Marcus Olsson](https://github.com/grafana/grafana-json-datasource)
+- [Infinity by Sriramajeyam Sugumaran](https://grafana.com/docs/plugins/yesoreyeram-infinity-datasource/latest/)
 - [Sun and Moon by fetzerch](https://github.com/fetzerch/grafana-sunandmoon-datasource)
 
 ### Data Sources
@@ -90,10 +92,12 @@ The following data sources need to be configured:
 > **_NOTE:_** After configuring connections, you might come across a 'database not found' error in Grafana. To resolve this, you can map InfluxDB v2 buckets to InfluxDB v1 databases by following the instructions provided in [Setting up InfluxDB v2 (Flux) with InfluxQL in Grafana](https://ivanahuckova.medium.com/setting-up-influxdb-v2-flux-with-influxql-in-grafana-926599a19eeb). To obtain the bucket IDs, use the command `influx bucket list`. More details can also be found on official Influx DB website [Query data with InfluxQL](https://docs.influxdata.com/influxdb/v2/query-data/influxql/)
 
 #### Other
-- JSON API to your inverter with the endpoint [/solar_api/v1/GetPowerFlowRealtimeData.fcgi](http://inverter/solar_api/v1/GetPowerFlowRealtimeData.fcgi)
+- Infinity Datasource with no additional configuration
 - Sun and Moon for your latitude and longitude
 
-> **_NOTE:_** The IP Address of the Symo GEN24 10.0 is in my network resolved by hostname `inverter`. Either you configure your network the same way or change the IP address in the JSON API datasource accordingly.
+> **_NOTE:_** The IP Address of the Symo GEN24 10.0 is in my network resolved by hostname `inverter`. Either you configure your network the same way or change the IP address in the `Power Flow` Panel of the dashboard accordingt to your configuration.
+
+![Power Flow Panel settings](grafana/screenshots/power_flow_panel_settings.png)
 
 ### Dashboard
 

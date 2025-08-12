@@ -33,6 +33,14 @@
       "pluginName": "InfluxDB"
     },
     {
+      "name": "DS_INFINITY-DATASOURCE-NO-CONF",
+      "label": "infinity-datasource-no-conf",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "yesoreyeram-infinity-datasource",
+      "pluginName": "Infinity"
+    },
+    {
       "name": "DS_INVERTER_STATUS POWER FLOW",
       "label": "Inverter status power flow",
       "description": "",
@@ -55,8 +63,8 @@
       "kind": 1,
       "model": {
         "datasource": {
-          "type": "marcusolsson-json-datasource",
-          "uid": "${DS_INVERTER_STATUS POWER FLOW}"
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "${DS_INFINITY-DATASOURCE-NO-CONF}"
         },
         "description": "",
         "fieldConfig": {
@@ -233,47 +241,73 @@
             "valueSize": 20
           }
         },
-        "pluginVersion": "11.4.0",
+        "pluginVersion": "12.1.0",
         "targets": [
           {
-            "cacheDurationSeconds": 0,
-            "datasource": {
-              "type": "marcusolsson-json-datasource",
-              "uid": "c22db054-79a4-46c1-a749-9a7556a2a4b1"
-            },
-            "fields": [
+            "columns": [
               {
-                "jsonPath": "$.Body.Data.Site.P_PV",
-                "name": "Solar Energy"
+                "selector": "Site.P_PV",
+                "text": "Solar Energy",
+                "type": "number"
               },
               {
-                "jsonPath": "$.Body.Data.Site.P_Load",
-                "language": "jsonpath",
-                "name": "Home Usage"
+                "selector": "Site.P_Load",
+                "text": "Home Usage",
+                "type": "number"
               },
               {
-                "jsonPath": "$.Body.Data.Site.P_Grid",
-                "language": "jsonpath",
-                "name": "Grid Usage"
+                "selector": "Site.P_Grid",
+                "text": "Grid Usage",
+                "type": "number"
               },
               {
-                "jsonPath": "$.Body.Data.Site.P_Akku",
-                "language": "jsonpath",
-                "name": "Storage"
+                "selector": "Site.P_Akku",
+                "text": "Storage",
+                "type": "number"
               },
               {
-                "jsonPath": "$.Body.Data.Inverters[\"1\"].SOC",
-                "language": "jsonpath",
-                "name": "Charge"
+                "selector": "Inverters.1.SOC",
+                "text": "Charge",
+                "type": "number"
               }
             ],
-            "method": "GET",
-            "queryParams": "",
+            "datasource": {
+              "type": "yesoreyeram-infinity-datasource",
+              "uid": "ee1mwywv3gv0gf"
+            },
+            "filters": [],
+            "format": "table",
+            "global_query_id": "",
+            "parser": "backend",
             "refId": "A",
-            "urlPath": ""
+            "root_selector": "$.Body.Data",
+            "source": "url",
+            "type": "json",
+            "url": "http://inverter/solar_api/v1/GetPowerFlowRealtimeData.fcgi",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
           }
         ],
         "title": "Power flow",
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {
+                "Charge": 4,
+                "Grid Usage": 2,
+                "Home Usage": 1,
+                "Solar Energy": 0,
+                "Storage": 3
+              },
+              "renameByName": {}
+            }
+          }
+        ],
         "type": "gauge"
       }
     },
@@ -1225,13 +1259,13 @@
       "type": "datasource",
       "id": "fetzerch-sunandmoon-datasource",
       "name": "Sun and Moon",
-      "version": "0.3.0"
+      "version": "0.3.3"
     },
     {
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "11.4.0"
+      "version": "12.1.0"
     },
     {
       "type": "datasource",
@@ -1243,7 +1277,7 @@
       "type": "datasource",
       "id": "marcusolsson-json-datasource",
       "name": "JSON API",
-      "version": "1.3.12"
+      "version": "1.3.24"
     },
     {
       "type": "panel",
@@ -1262,6 +1296,12 @@
       "id": "timeseries",
       "name": "Time series",
       "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "yesoreyeram-infinity-datasource",
+      "name": "Infinity",
+      "version": "3.4.1"
     }
   ],
   "annotations": {
@@ -1357,7 +1397,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1625,12 +1665,13 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "Home Usage",
@@ -2180,12 +2221,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -2359,12 +2401,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -2396,9 +2439,16 @@
           "id": "calculateField",
           "options": {
             "binary": {
-              "left": "smartmeter.to_grid",
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
               "operator": "*",
-              "right": "-1"
+              "right": {
+                "fixed": "-1"
+              }
             },
             "mode": "binary",
             "reduce": {
@@ -2463,7 +2513,8 @@
             },
             "renameByName": {
               "Local Energy Consumption": "",
-              "smartmeter.to_grid * -1": "To Grid"
+              "smartmeter.to_grid * -1": "To Grid",
+              "smartmeter.to_grid * -1 smartmeter.to_grid": "To Grid"
             }
           }
         }
@@ -2500,7 +2551,7 @@
             "steps": [
               {
                 "color": "super-light-yellow",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -2534,7 +2585,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "Today",
@@ -2651,7 +2702,7 @@
             "steps": [
               {
                 "color": "blue",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -2687,7 +2738,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -2810,7 +2861,7 @@
             "steps": [
               {
                 "color": "super-light-blue",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -2844,7 +2895,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -2921,7 +2972,7 @@
             "steps": [
               {
                 "color": "yellow",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -2955,7 +3006,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -3016,7 +3067,7 @@
             "steps": [
               {
                 "color": "dark-purple",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -3052,7 +3103,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -3129,7 +3180,7 @@
             "steps": [
               {
                 "color": "super-light-purple",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -3165,7 +3216,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -3240,7 +3291,7 @@
             "steps": [
               {
                 "color": "red",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -3274,7 +3325,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -3349,7 +3400,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -3385,7 +3436,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -3478,7 +3529,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -3518,7 +3569,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "",
@@ -3580,7 +3631,7 @@
             "steps": [
               {
                 "color": "dark-green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -3613,7 +3664,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "",
@@ -3849,7 +3900,7 @@
             "steps": [
               {
                 "color": "yellow",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -3885,7 +3936,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -3950,7 +4001,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -4035,7 +4086,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -4219,7 +4270,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -4305,7 +4356,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -4490,7 +4541,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -4576,7 +4627,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -4761,7 +4812,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -4847,7 +4898,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -5033,7 +5084,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -5119,7 +5170,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -5305,7 +5356,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -5390,7 +5441,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -5652,12 +5703,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -5834,12 +5886,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -6016,12 +6069,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -6198,12 +6252,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -6379,12 +6434,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -6561,12 +6617,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -6600,9 +6657,16 @@
           "id": "calculateField",
           "options": {
             "binary": {
-              "left": "smartmeter.to_grid",
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
               "operator": "*",
-              "right": "-1"
+              "right": {
+                "fixed": "-1"
+              }
             },
             "mode": "binary",
             "reduce": {
@@ -6667,7 +6731,9 @@
             },
             "renameByName": {
               "Local Energy Consumption": "",
-              "smartmeter.to_grid * -1": "To Grid"
+              "powerflow.to_grid": "",
+              "smartmeter.to_grid * -1": "To Grid",
+              "smartmeter.to_grid * -1 smartmeter.to_grid": "To Grid"
             }
           }
         }
@@ -6759,12 +6825,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -6798,9 +6865,16 @@
           "id": "calculateField",
           "options": {
             "binary": {
-              "left": "smartmeter.to_grid",
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
               "operator": "*",
-              "right": "-1"
+              "right": {
+                "fixed": "-1"
+              }
             },
             "mode": "binary",
             "reduce": {
@@ -6865,7 +6939,8 @@
             },
             "renameByName": {
               "Local Energy Consumption": "",
-              "smartmeter.to_grid * -1": "To Grid"
+              "smartmeter.to_grid * -1": "To Grid",
+              "smartmeter.to_grid * -1 smartmeter.to_grid": "To Grid"
             }
           }
         }
@@ -6957,14 +7032,16 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
+          "alias": "",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_INFLUXDB_(INVERTER)}"
@@ -6996,9 +7073,16 @@
           "id": "calculateField",
           "options": {
             "binary": {
-              "left": "smartmeter.to_grid",
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
               "operator": "*",
-              "right": "-1"
+              "right": {
+                "fixed": "-1"
+              }
             },
             "mode": "binary",
             "reduce": {
@@ -7063,7 +7147,8 @@
             },
             "renameByName": {
               "Local Energy Consumption": "",
-              "smartmeter.to_grid * -1": "To Grid"
+              "smartmeter.to_grid * -1": "To Grid",
+              "smartmeter.to_grid * -1 smartmeter.to_grid": "To Grid"
             }
           }
         }
@@ -7155,12 +7240,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -7193,9 +7279,16 @@
           "id": "calculateField",
           "options": {
             "binary": {
-              "left": "smartmeter.to_grid",
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
               "operator": "*",
-              "right": "-1"
+              "right": {
+                "fixed": "-1"
+              }
             },
             "mode": "binary",
             "reduce": {
@@ -7260,7 +7353,8 @@
             },
             "renameByName": {
               "Local Energy Consumption": "",
-              "smartmeter.to_grid * -1": "To Grid"
+              "smartmeter.to_grid * -1": "To Grid",
+              "smartmeter.to_grid * -1 smartmeter.to_grid": "To Grid"
             }
           }
         }
@@ -7352,12 +7446,13 @@
           "values": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "datasource": {
@@ -7391,9 +7486,16 @@
           "id": "calculateField",
           "options": {
             "binary": {
-              "left": "smartmeter.to_grid",
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
               "operator": "*",
-              "right": "-1"
+              "right": {
+                "fixed": "-1"
+              }
             },
             "mode": "binary",
             "reduce": {
@@ -7458,7 +7560,8 @@
             },
             "renameByName": {
               "Local Energy Consumption": "",
-              "smartmeter.to_grid * -1": "To Grid"
+              "smartmeter.to_grid * -1": "To Grid",
+              "smartmeter.to_grid * -1 smartmeter.to_grid": "To Grid"
             }
           }
         }
@@ -7532,7 +7635,7 @@
             "steps": [
               {
                 "color": "yellow",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -7555,12 +7658,13 @@
           "showLegend": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "Local Energy Production",
@@ -7669,7 +7773,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -7756,12 +7860,13 @@
           "showLegend": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "",
@@ -7957,7 +8062,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
@@ -8011,12 +8116,13 @@
           "showLegend": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "From Storage",
@@ -8130,7 +8236,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -8188,12 +8294,13 @@
           "showLegend": false
         },
         "tooltip": {
+          "hideZeros": false,
           "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "From Grid",
@@ -8365,7 +8472,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -8399,13 +8506,14 @@
         "showValue": "auto",
         "stacking": "none",
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         },
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": ">10kW",
@@ -8999,7 +9107,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -9033,13 +9141,14 @@
         "showValue": "auto",
         "stacking": "none",
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         },
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": ">10kW",
@@ -9659,7 +9768,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -9688,11 +9797,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "L1",
@@ -9875,7 +9985,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -9904,11 +10014,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "P1",
@@ -10095,7 +10206,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -10140,11 +10251,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "Apparent S P1",
@@ -10589,7 +10701,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -10634,11 +10746,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "Power AC",
@@ -10738,7 +10851,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -10784,11 +10897,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "Temperature",
@@ -10888,7 +11002,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -10934,11 +11048,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "Frequency",
@@ -11038,7 +11153,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -11084,11 +11199,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "11.4.0",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "AC L1",
@@ -11371,6 +11487,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -11402,7 +11519,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -11448,11 +11566,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "AC L1",
@@ -11735,6 +11854,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -11766,7 +11886,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -11909,11 +12030,12 @@
           "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "9.1.2",
+      "pluginVersion": "12.1.0",
       "targets": [
         {
           "alias": "Current max capacity",
@@ -12006,7 +12128,7 @@
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 40,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
@@ -12041,6 +12163,6 @@
   "timezone": "browser",
   "title": "Photovoltaik",
   "uid": "RSabAvRRzVz",
-  "version": 192,
+  "version": 196,
   "weekStart": ""
 }
