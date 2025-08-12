@@ -101,7 +101,10 @@ The following data sources need to be configured:
 
 ### Dashboard
 
-After the basic configuration is done, the dashboard can be imported from the [dashboard.json file](grafana/dashboard.json).
+After the basic configuration is done, the dashboards can be imported from the
+
+- [dashboard.json file](grafana/dashboard.json)
+- [ernergy_production_cost.json file](grafana/energy_production_cost.json)
 
 To import the dashboard, download the file and follow these steps:
 
@@ -109,11 +112,16 @@ To import the dashboard, download the file and follow these steps:
 2. Navigate to Dashboards > New > Import.
 3. Upload the downloaded file.
 
-By default, the dashboard shows the current day and is refreshed every 5 seconds. The short refresh time was selected because the `Power flow` panel uses JSON API to show the most recent values and is not restricted to a time interval of data in InfluxDB.
+> By default, the dashboard shows the current day and is refreshed every 5 seconds. The short refresh time was selected because the `Power flow` panel uses Fronius JSON API to show the most recent values and is not restricted to a time interval of data in InfluxDB.
 
-### Screenshot
+### Screenshot Dashboard
 
 ![Dashboard](grafana/screenshots/dashboard.png)
+
+### Screenshot Energy Production & Cost Dashboard
+
+![Energy Production & Cost Dashboard](grafana/screenshots/energy_cost_dashboard.png)
+
 
 ## Credits
 

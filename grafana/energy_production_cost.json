@@ -1,0 +1,1455 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB_(INVERTER)",
+      "label": "InfluxDB (inverter)",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    },
+    {
+      "name": "DS_INFLUXDB_(ENERGYPRICES)",
+      "label": "InfluxDB (energyprices)",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    },
+    {
+      "name": "VAR_TZ",
+      "type": "constant",
+      "label": "Timezone",
+      "value": "Europe/Vienna",
+      "description": ""
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.1.0"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "piechart",
+      "name": "Pie chart",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "To Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 11,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Self consumption",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "-1"
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "include": [
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "From Grid": true,
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "From Grid": 2,
+              "Local Energy Consumption": 1,
+              "Time": 0,
+              "powerflow.produced": 3,
+              "powerflow.to_grid": 4,
+              "smartmeter.produced": 5,
+              "smartmeter.to_grid": 6,
+              "smartmeter.to_grid * -1": 7
+            },
+            "renameByName": {
+              "Local Energy Consumption": "",
+              "smartmeter.to_grid * -1": "To Grid",
+              "smartmeter.to_grid * -1 smartmeter.to_grid": "To Grid"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_INFLUXDB_(INVERTER)}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local Energy Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT  (last(\"E_Total\") - first(\"E_Total\")) as produced, -(last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\",  \"autogen\".\"powerflow\" WHERE $timeFilter tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "From Grid",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\") FROM \"autogen\".\"smartmeter\" WHERE $timeFilter tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Autonomy",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Local Energy Consumption",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "powerflow.from_grid": true,
+              "powerflow.from_grid4hu": true,
+              "powerflow.produced": true,
+              "powerflow.produced2": true,
+              "powerflow.produced4dc": true,
+              "powerflow.produced4hu": true,
+              "powerflow.to_grid": true,
+              "powerflow.to_grid2": true,
+              "powerflow.to_grid4dc": true,
+              "powerflow.to_grid4hu": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.from_grid4hu": true,
+              "smartmeter.produced": true,
+              "smartmeter.produced2": true,
+              "smartmeter.produced4dc": true,
+              "smartmeter.produced4hu": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid2": true,
+              "smartmeter.to_grid4dc": true,
+              "smartmeter.to_grid4hu": true
+            },
+            "indexByName": {
+              "Directly Consumed": 2,
+              "From Grid": 3,
+              "Home Usage": 1,
+              "Time": 0,
+              "powerflow.from_grid": 6,
+              "powerflow.produced": 4,
+              "powerflow.produced4dc": 10,
+              "powerflow.to_grid": 5,
+              "powerflow.to_grid4dc": 11,
+              "smartmeter.from_grid": 9,
+              "smartmeter.produced": 7,
+              "smartmeter.produced4dc": 12,
+              "smartmeter.to_grid": 8,
+              "smartmeter.to_grid4dc": 13
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "super-light-blue",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/Cost.*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cost (Sell)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Not earned"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cost (Buy)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Not payed"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Consumed"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "­"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 8
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 15,
+          "valueSize": 30
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
+          },
+          "hide": false,
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Solar to home",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "-1"
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Consumed",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid * -1"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Consumed"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "electricity.sellEuroWh"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Consumed"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "electricity.buyEuroWh"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "smartmeter.to_grid"
+              },
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "Consumed"
+              }
+            ],
+            "match": "any",
+            "type": "include"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Consumed * electricity.sellEuroWh": false,
+              "Directly Consumed": true,
+              "Directly Consumed / 1000": true,
+              "Time": true,
+              "electricity.buyEuroWh": true,
+              "electricity.sellEuroWh": true,
+              "powerflow.from_grid": true,
+              "powerflow.produced": true,
+              "powerflow.to_grid": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.produced": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid * -1": true,
+              "smartmeter.to_grid / 1000": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Time": 0,
+              "Total": 8,
+              "electricity.buyEuroWh": 6,
+              "electricity.sellEuroWh": 5,
+              "powerflow.produced": 4,
+              "smartmeter.from_grid": 3,
+              "smartmeter.to_grid": 2,
+              "smartmeter.to_grid * -1": 7,
+              "solar > home": 1
+            },
+            "renameByName": {
+              "Consumed": "",
+              "Consumed * electricity.buyEuroWh": "Cost (Buy)",
+              "Consumed * electricity.sellEuroWh": "Cost (Sell)",
+              "Total": "",
+              "from Grid": "Consumed",
+              "from Grid * electricity.buyEuroWh": "Costs",
+              "smartmeter.to_grid": ""
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Costs"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 4,
+        "y": 8
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
+          },
+          "hide": false,
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Solar to Grid",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "electricity.sellEuroWh"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "smartmeter.to_grid"
+              }
+            ],
+            "match": "any",
+            "type": "include"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Directly Consumed": true,
+              "Directly Consumed / 1000": true,
+              "Time": true,
+              "electricity.buyEuroWh": true,
+              "electricity.sellEuroWh": true,
+              "powerflow.from_grid": true,
+              "powerflow.produced": true,
+              "powerflow.to_grid": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.produced": true,
+              "smartmeter.to_grid": false,
+              "smartmeter.to_grid * -1": true,
+              "smartmeter.to_grid / 1000": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Time": 0,
+              "Total": 8,
+              "electricity.buyEuroWh": 6,
+              "electricity.sellEuroWh": 5,
+              "powerflow.produced": 4,
+              "smartmeter.from_grid": 3,
+              "smartmeter.to_grid": 2,
+              "smartmeter.to_grid * -1": 7,
+              "solar > home": 1
+            },
+            "renameByName": {
+              "Total": "",
+              "from Grid": "Consumed",
+              "from Grid * electricity.buyEuroWh": "Costs",
+              "smartmeter.to_grid": "Consumed",
+              "smartmeter.to_grid * electricity.buyEuroWh": "Costs",
+              "smartmeter.to_grid * electricity.sellEuroWh": "Costs"
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Costs"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 8,
+        "y": 8
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
+          },
+          "hide": false,
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Grid to home",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.from_grid"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "electricity.buyEuroWh"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "smartmeter.from_grid"
+              }
+            ],
+            "match": "any",
+            "type": "include"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Directly Consumed": true,
+              "Directly Consumed / 1000": true,
+              "Time": true,
+              "electricity.buyEuroWh": true,
+              "electricity.sellEuroWh": true,
+              "powerflow.from_grid": true,
+              "powerflow.produced": true,
+              "powerflow.to_grid": true,
+              "smartmeter.from_grid": false,
+              "smartmeter.produced": true,
+              "smartmeter.to_grid": false,
+              "smartmeter.to_grid * -1": true,
+              "smartmeter.to_grid / 1000": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Time": 0,
+              "Total": 8,
+              "electricity.buyEuroWh": 6,
+              "electricity.sellEuroWh": 5,
+              "powerflow.produced": 4,
+              "smartmeter.from_grid": 3,
+              "smartmeter.to_grid": 2,
+              "smartmeter.to_grid * -1": 7,
+              "solar > home": 1
+            },
+            "renameByName": {
+              "Total": "",
+              "from Grid": "Consumed",
+              "from Grid * electricity.buyEuroWh": "Costs",
+              "smartmeter.from_grid": "Consumed",
+              "smartmeter.from_grid * electricity.buyEuroWh": "Costs",
+              "smartmeter.to_grid": "solar > grid"
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "solar > home"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-blue",
+                  "mode": "shades"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "solar > grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 12,
+        "y": 8
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"EnergyReal_WAC_Minus_Absolute\") -  first(\"EnergyReal_WAC_Minus_Absolute\")) as to_grid, (last(\"EnergyReal_WAC_Plus_Absolute\") -  first(\"EnergyReal_WAC_Plus_Absolute\")) as from_grid FROM \"autogen\".\"smartmeter\" WHERE $timeFilter GROUP BY time(1d) fill(0) tz('${tz:raw}')\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(INVERTER)}"
+          },
+          "hide": false,
+          "query": "SELECT (last(\"E_Total\") - first(\"E_Total\")) as produced FROM \"autogen\".\"powerflow\" WHERE $timeFilter GROUP BY time(1d) fill(0)  tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB_(ENERGYPRICES)}"
+          },
+          "hide": false,
+          "query": "SELECT mean(\"sell\")/100000 as sellEuroWh, mean(\"buy\")/100000 as buyEuroWh FROM \"autogen\".\"electricity\" GROUP BY time(1d) fill(previous) tz('${tz:raw}')",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Savings",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "fixed": "-1"
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Directly Consumed",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "powerflow.produced",
+                "smartmeter.to_grid * -1"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "solar > home",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Directly Consumed"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "electricity.buyEuroWh"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "solar > grid",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "smartmeter.to_grid"
+                }
+              },
+              "operator": "*",
+              "right": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "electricity.sellEuroWh"
+                }
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "Directly Consumed"
+              },
+              {
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                },
+                "fieldName": "smartmeter.to_grid"
+              }
+            ],
+            "match": "any",
+            "type": "include"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "solar > grid",
+                "solar > home"
+              ],
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Directly Consumed": true,
+              "Directly Consumed / 1000": true,
+              "Time": true,
+              "electricity.buyEuroWh": true,
+              "electricity.sellEuroWh": true,
+              "powerflow.from_grid": true,
+              "powerflow.produced": true,
+              "powerflow.to_grid": true,
+              "smartmeter.from_grid": true,
+              "smartmeter.produced": true,
+              "smartmeter.to_grid": true,
+              "smartmeter.to_grid * -1": true,
+              "smartmeter.to_grid / 1000": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "stat"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "description": "Timezone",
+        "hide": 2,
+        "label": "Timezone",
+        "name": "tz",
+        "query": "${VAR_TZ}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_TZ}",
+          "text": "${VAR_TZ}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_TZ}",
+            "text": "${VAR_TZ}",
+            "selected": false
+          }
+        ]
+      }
+    ]
+  },
+  "time": {
+    "from": "now/d",
+    "to": "now/d"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Energy Production & Cost Summary",
+  "uid": "ae1mc4zmbny80a",
+  "version": 47,
+  "weekStart": ""
+}
