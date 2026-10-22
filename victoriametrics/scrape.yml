@@ -1,0 +1,32 @@
+# Scrape config for VictoriaMetrics (-promscrape.config) or vmagent. Also works for Prometheus.
+#
+# %{FRONIUS_HOST} is replaced by VictoriaMetrics/vmagent with the environment variable FRONIUS_HOST
+# (hostname or IP of your Fronius inverter). With Prometheus, replace it by hand.
+# Adjust `json-exporter:7979` if json-exporter runs elsewhere (Kubernetes: json-exporter.<namespace>.svc:7979).
+# Remove targets for components you do not have (storage, ohmpilot).
+scrape_configs:
+  - job_name: fronius
+    scrape_interval: 60s
+    metrics_path: /probe
+    static_configs:
+      - targets: ["http://%{FRONIUS_HOST}/solar_api/v1/GetPowerFlowRealtimeData.fcgi"]
+        labels: {__param_module: fronius_powerflow}
+      - targets: ["http://%{FRONIUS_HOST}/solar_api/v1/GetMeterRealtimeData.cgi?Scope=System"]
+        labels: {__param_module: fronius_smartmeter}
+      - targets: ["http://%{FRONIUS_HOST}/solar_api/v1/GetInverterRealtimeData.cgi?Scope=Device&DeviceId=1&DataCollection=CommonInverterData"]
+        labels: {__param_module: fronius_inverter_common}
+      - targets: ["http://%{FRONIUS_HOST}/solar_api/v1/GetInverterRealtimeData.cgi?Scope=Device&DeviceId=1&DataCollection=3PInverterData"]
+        labels: {__param_module: fronius_inverter_3p}
+      - targets: ["http://%{FRONIUS_HOST}/solar_api/v1/GetStorageRealtimeData.cgi"]
+        labels: {__param_module: fronius_storage}
+      - targets: ["http://%{FRONIUS_HOST}/solar_api/v1/GetOhmPilotRealtimeData.cgi"]
+        labels: {__param_module: fronius_ohmpilot}
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_module]
+        target_label: module
+      - target_label: instance
+        replacement: fronius
+      - target_label: __address__
+        replacement: json-exporter:7979

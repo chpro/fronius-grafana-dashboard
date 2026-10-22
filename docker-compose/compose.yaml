@@ -1,0 +1,68 @@
+# Complete stack: json-exporter + VictoriaMetrics + Grafana (+ optional forecast.solar import)
+#
+#   cp .env.example .env   # adjust values
+#   docker compose up -d                       # without forecast
+#   docker compose --profile forecast up -d    # with forecast (needs FORECAST_URL)
+#
+# Grafana: http://localhost:3000 (admin / GRAFANA_ADMIN_PASSWORD), dashboard "Fronius PV (VictoriaMetrics)"
+name: fronius
+
+services:
+  json-exporter:
+    image: quay.io/prometheuscommunity/json-exporter:v0.7.0
+    command: ["--config.file=/config/config.yml"]
+    volumes:
+      - ../json-exporter/config.yml:/config/config.yml:ro
+    restart: unless-stopped
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.154.1
+    command:
+      - -storageDataPath=/storage
+      - -retentionPeriod=10y
+      - -promscrape.config=/etc/victoriametrics/scrape.yml
+      - -promscrape.configCheckInterval=1m
+      # forecast.solar delivers values with timestamps in the future
+      - -futureRetention=7d
+    environment:
+      FRONIUS_HOST: ${FRONIUS_HOST:?set FRONIUS_HOST in .env}
+    volumes:
+      - ../victoriametrics/scrape.yml:/etc/victoriametrics/scrape.yml:ro
+      - vm-data:/storage
+    ports:
+      - "8428:8428"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.2.1
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_PLUGINS_PREINSTALL: victoriametrics-metrics-datasource,fetzerch-sunandmoon-datasource
+      LATITUDE: ${LATITUDE:-48.2}
+      LONGITUDE: ${LONGITUDE:-16.37}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../grafana/dashboard.json:/var/lib/grafana/dashboards/fronius/dashboard.json:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - victoriametrics
+    restart: unless-stopped
+
+  forecast:
+    image: alpine:3.24
+    profiles: [forecast]
+    command: ["/bin/sh", "-c", "while true; do /bin/sh /fetch-forecast.sh || true; sleep 900; done"]
+    environment:
+      FORECAST_URL: ${FORECAST_URL:-}
+      VM_URL: http://victoriametrics:8428
+    volumes:
+      - ../forecast/fetch-forecast.sh:/fetch-forecast.sh:ro
+    depends_on:
+      - victoriametrics
+    restart: unless-stopped
+
+volumes:
+  vm-data:
+  grafana-data:

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: json-exporter
+  labels:
+    app.kubernetes.io/name: json-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: json-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: json-exporter
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: json-exporter
+          image: quay.io/prometheuscommunity/json-exporter:v0.7.0
+          args:
+            - --config.file=/config/config.yml
+          ports:
+            - name: http
+              containerPort: 7979
+          readinessProbe:
+            tcpSocket:
+              port: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: json-exporter-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: json-exporter
+  labels:
+    app.kubernetes.io/name: json-exporter
+spec:
+  selector:
+    app.kubernetes.io/name: json-exporter
+  ports:
+    - name: http
+      port: 7979
+      targetPort: http

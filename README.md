@@ -1,144 +1,170 @@
-# Data Visualization for Fronius
+# Fronius Grafana Dashboard for VictoriaMetrics
 
-**Disclaimer:** This project is intended for advanced users who are comfortable with data visualization and Fronius systems. No support or warranty is provided. Use at your own risk.
+Grafana dashboard for Fronius inverters (Symo GEN24, Smart Meter, battery) with
+**json-exporter + VictoriaMetrics** instead of Telegraf + InfluxDB.
 
-This README provides information on setting up and visualizing data from your Fronius Symo GEN24 10.0 inverter and Smart Meter TS 65A-3 using InfluxDB and Grafana.
+This is a fork of [chpro/fronius-grafana-dashboard](https://github.com/chpro/fronius-grafana-dashboard).
+The dashboard layout and panels are the original work of chpro; this fork replaces the data pipeline and
+rewrites every query in MetricsQL.
 
-## Fronius Setup
-
-- **Inverter**: Symo GEN24 10.0 (Fírmware >= ROW 1.36.6-1)
-  - Fronius JSON API (v1) enabled. For more details, refer to the [Fronius Solar API documentation](https://www.fronius.com/en/solar-energy/installers-partners/technical-data/all-products/system-monitoring/open-interfaces/fronius-solar-api-json-).
-- **Smart Meter**: TS 65A-3
-  - Meter Location: 0 - Grid Interconnection Point (Primary Meter)
-- **Storage**: BYD HVS 5.1
-
-> **_NOTE:_** All Grafana configurations related to minimum and maximum values align with this setup.
-
-## Telegraf, Influx and Grafana Installation
-
-To set up the TIG (Telegraf, InfluxDB, and Grafana) stack, please follow any how-to guide you find, such as [this search](https://duckduckgo.com/?t=h_&q=setup+tig+stack&ia=web).
-
-## Influx
-
-The following buckets have been created in InfluxDB:
-
-- inverter
-- pvforecast
-- energyprices
-
-### Data Import
-
-Telegraf is utilized for importing data from the Fronius JSON API and forecast data from [forecast.solar](https://forecast.solar). The full configuration can be found in [telegraf.conf](telegraf/telegraf.conf).
-
-#### Energy Data
-
-Please adapt the configuration for InfluxDB output to your needs:
-```toml
-[[outputs.influxdb_v2]]
-    urls = ["http://127.0.0.1:8086"]
-    token = "change_me"
-    organization = "default"
-```
-> **_NOTE:_** The IP Address of the Symo GEN24 10.0 is in my network resolved by hostname `inverter`. Either you configure your network the same way or change the IP address in the configuration.
-
-#### Forecast
-
-Additionally, please make sure to adapt the links to the [api.forecast.solar](https://api.forecast.solar) in the configuration file as there are currently only placeholders. In the dashboard, the only displayed metric is `Watt hours per day`, presented as `Expected yield`.
-
-For more information about using the API, you can refer to the following documentation:
-- [API Documentation for Estimations](https://doc.forecast.solar/api:estimate)
-- [Finding Your Azimuth](https://doc.forecast.solar/find_your_azimuth)
-
-These links should provide you with the necessary details to configure and utilize the forecast data effectively in your setup.
-
-#### Energy Prices
-
-Energy prices need to be available to calculate savings. Please note that the accuracy of prices in queries is limited to daily updates. Prices are imported via CSV using the InfluxDB load data feature. The CSV file content should adhere to the specified format:
-
-```csv
-#group,false,false,true,true,false,false,true,true,true
-#datatype,string,long,dateTime:RFC3339,dateTime:RFC3339,dateTime:RFC3339,double,string,string,string
-#default,mean,,,,,,,,
-,result,table,_start,_stop,_time,_value,_field,_measurement,unit
-,,0,2023-04-01T00:00:00+02:00,2023-04-01T00:00:00+02:00,2023-04-01T00:00:00+02:00,14.457,sell,electricity,Cent/kWh
-,,0,2023-07-01T00:00:00+02:00,2023-07-01T00:00:00+02:00,2023-07-01T00:00:00+02:00,13.691,sell,electricity,Cent/kWh
-,,0,2021-10-02T00:00:00+02:00,2021-10-02T00:00:00+02:00,2021-10-02T00:00:00+02:00,21.211,buy,electricity,Cent/kWh
-```
-
-## Grafana
-
-### Plugins
-
-The following Grafana plugins need to be installed:
-
-- [Infinity by Sriramajeyam Sugumaran](https://grafana.com/docs/plugins/yesoreyeram-infinity-datasource/latest/)
-- [Sun and Moon by fetzerch](https://github.com/fetzerch/grafana-sunandmoon-datasource)
-
-### Data Sources
-
-The following data sources need to be configured:
-
-#### InfluxDB
-- InfluxDB to the `energyprices` bucket
-- InfluxDB to the `inverter` bucket
-- InfluxDB to the `pvforecast` bucket
-
-> **_NOTE:_** The Query Language needs to be set to `InfluxQL`
-
-![Datasource example settings](grafana/screenshots/datasource_settings.png)
-
-> **_NOTE:_** To authorize access, use the `Authorization` header with the value `Token YOUR_TOKEN`. Replace `YOUR_TOKEN` with the token generated for InfluxDB access ([InfluxDB v2 API documentation](https://docs.influxdata.com/influxdb/v2/api/#section/Authentication/TokenAuthentication)).
-
-> **_NOTE:_** After configuring connections, you might come across a 'database not found' error in Grafana. To resolve this, you can map InfluxDB v2 buckets to InfluxDB v1 databases by following the instructions provided in [Setting up InfluxDB v2 (Flux) with InfluxQL in Grafana](https://ivanahuckova.medium.com/setting-up-influxdb-v2-flux-with-influxql-in-grafana-926599a19eeb). To obtain the bucket IDs, use the command `influx bucket list`. More details can also be found on official Influx DB website [Query data with InfluxQL](https://docs.influxdata.com/influxdb/v2/query-data/influxql/)
-
-#### Other
-- Infinity Datasource with no additional configuration
-- Sun and Moon for your latitude and longitude
-
-> **_NOTE:_** The IP Address of the Symo GEN24 10.0 is in my network resolved by hostname `inverter`. Either you configure your network the same way or change the IP address in the `Power Flow` Panel and `Battery & Grid` Panel of the dashboard accordingt to your configuration.
-
-![Power Flow Panel settings](grafana/screenshots/power_flow_panel_settings.png)
-
-### Dashboard
-
-After the basic configuration is done, the dashboards can be imported from the
-
-- [dashboard.json file](grafana/dashboard.json)
-- [ernergy_production_cost.json file](grafana/energy_production_cost.json)
-
-To import the dashboard, download the file and follow these steps:
-
-1. Go to Grafana.
-2. Navigate to Dashboards > New > Import.
-3. Upload the downloaded file.
-
-> By default, the dashboard shows the current day and is refreshed every 5 seconds. The short refresh time was selected because the `Power flow` panel uses Fronius JSON API to show the most recent values and is not restricted to a time interval of data in InfluxDB.
-
-### Screenshot Dashboard
+**Disclaimer:** This project is intended for advanced users who are comfortable with data visualization and
+Fronius systems. No support or warranty is provided. Use at your own risk.
 
 ![Dashboard](grafana/screenshots/dashboard.png)
 
-### Screenshot Energy Production & Cost Dashboard
+## What is different from the original
 
-![Energy Production & Cost Dashboard](grafana/screenshots/energy_cost_dashboard.png)
+- **No Telegraf, no InfluxDB:** [json-exporter](https://github.com/prometheus-community/json_exporter) turns the
+  Fronius Solar API into Prometheus metrics, VictoriaMetrics scrapes and stores them.
+- **History can be migrated:** metric names are identical to what Telegraf wrote to InfluxDB, see
+  [migration/influxdb-to-victoriametrics.md](migration/influxdb-to-victoriametrics.md).
+- **Fewer Grafana plugins:** the power flow gauges read from VictoriaMetrics too, so Grafana no longer talks to
+  the inverter directly (no Infinity/JSON datasource needed).
+- **Correct calendar days in any timezone, including daylight saving time changes:** daily bars use local
+  midnight in the configured timezone.
+- **Energy prices as dashboard variables** instead of an InfluxDB bucket. Savings are calculated per hour, so
+  price changes are applied exactly when they take effect.
+- **Docker Compose and Kubernetes** deployment included.
 
+## Architecture
+
+```
+Fronius inverter ──(Solar API v1, HTTP/JSON)──> json-exporter :7979
+                                                      ▲
+                                                      │ scrape /probe every 60s
+                                                      │
+forecast.solar ──> fetch-forecast.sh ──(CSV import)──> VictoriaMetrics :8428 ──> Grafana
+```
+
+## Requirements
+
+- Fronius inverter with **Solar API v1 enabled** (inverter web UI → Communication → Solar API).
+  Developed with Symo GEN24 10.0, Smart Meter TS 65A-3 (meter location: grid interconnection point) and
+  BYD Battery-Box Premium HVS. Min/max values in the panels match this setup.
+- **VictoriaMetrics** (single-node or cluster/vmagent). Plain Prometheus is not enough: the queries use
+  MetricsQL functions such as `first_over_time`, `sum_gt_over_time` and `timezone_offset`.
+- **Grafana 11 or newer** with these plugins:
+  - [VictoriaMetrics datasource](https://grafana.com/grafana/plugins/victoriametrics-metrics-datasource/)
+  - [Sun and Moon](https://grafana.com/grafana/plugins/fetzerch-sunandmoon-datasource/) (sun altitude in the
+    "Energy Usage" panel), configured with your latitude/longitude
+- Optional: a [forecast.solar](https://forecast.solar) URL for the "Expected yield" panel.
+
+## Quick start with Docker Compose
+
+Starts json-exporter, VictoriaMetrics and Grafana with provisioned datasources and dashboard.
+
+```bash
+cd docker-compose
+cp .env.example .env    # set FRONIUS_HOST, LATITUDE, LONGITUDE, GRAFANA_ADMIN_PASSWORD
+docker compose up -d
+# with forecast (set FORECAST_URL in .env first):
+docker compose --profile forecast up -d
+```
+
+Open Grafana at <http://localhost:3000> and the dashboard **Fronius PV (VictoriaMetrics)**.
+Then set timezone and prices, see [Dashboard settings](#dashboard-settings).
+
+## Kubernetes
+
+The repository root is a kustomization that deploys json-exporter, the forecast CronJob and the dashboard as a
+ConfigMap for the Grafana sidecar (label `grafana_dashboard: "1"`, as used by kube-prometheus-stack and the
+Grafana Helm chart). VictoriaMetrics and Grafana are expected to exist already.
+
+```bash
+kubectl create namespace monitoring
+kubectl -n monitoring create secret generic pv-forecast \
+  --from-literal=FORECAST_URL='https://api.forecast.solar/estimate/watthours/<lat>/<lon>/<dec>/<az>/<kwp>?time=utc'
+kubectl apply --server-side -k .
+```
+
+For Argo CD or Flux, point an application at this repository (or a fork of it) and override the namespace with
+an overlay if needed. Adjust `VM_URL` in [kubernetes/pv-forecast-cronjob.yaml](kubernetes/pv-forecast-cronjob.yaml)
+to your VictoriaMetrics service.
+
+Then add the scrape job from [victoriametrics/scrape.yml](victoriametrics/scrape.yml) to your VictoriaMetrics or
+vmagent config, with `json-exporter:7979` replaced by `json-exporter.monitoring.svc:7979`, and set the
+environment variable `FRONIUS_HOST` on VictoriaMetrics/vmagent (or replace `%{FRONIUS_HOST}` directly).
+
+## Using an existing VictoriaMetrics and Grafana
+
+1. Run json-exporter with [json-exporter/config.yml](json-exporter/config.yml).
+2. Add the scrape job from [victoriametrics/scrape.yml](victoriametrics/scrape.yml).
+3. For the forecast: start VictoriaMetrics with `-futureRetention=7d` (forecast values have timestamps in the
+   future) and run [forecast/fetch-forecast.sh](forecast/fetch-forecast.sh) every 15 minutes.
+4. Import [grafana/dashboard.json](grafana/dashboard.json) (Dashboards → New → Import) and select your
+   VictoriaMetrics datasource in the variable at the top of the dashboard.
+
+## Dashboard settings
+
+Dashboard settings → Variables:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `datasource` | first VictoriaMetrics datasource | datasource for all metric panels |
+| `sunandmoon` | first Sun and Moon datasource | sun altitude |
+| `tz` | `Europe/Berlin` | IANA timezone for calendar days. Should match the dashboard/browser timezone. |
+| `price_buy` | `0.30` | price per kWh drawn from the grid |
+| `price_sell` | `0.08` | feed-in tariff per kWh |
+
+Savings are shown in EUR; change the unit of the savings panels if you use another currency.
+
+Prices can change over time. Use a MetricsQL expression with `time()` (Unix timestamp of the change), e.g.
+
+```
+(0.35 * (time() < bool 1772319600) + 0.25 * (time() >= bool 1772319600))
+```
+
+for 0.35 until 2026-03-01 00:00 CET and 0.25 afterwards. Add one term per price period.
+
+Save the dashboard after changing variables. With file provisioning, set `allowUiUpdates` (already done in the
+Compose setup) or edit the defaults in `grafana/dashboard.json`.
+
+## How the numbers are calculated
+
+- **Energy within the selected time range** (stat panels): difference of the meter counters
+  (`powerflow_E_Total`, `smartmeter_EnergyReal_WAC_Plus_Absolute`, `smartmeter_EnergyReal_WAC_Minus_Absolute`)
+  between start and end of the range. Battery energy is integrated from `powerflow_P_Akku`.
+- **Daily bars:** VictoriaMetrics aligns daily steps to 00:00 UTC. The queries therefore evaluate the counters
+  on an hourly grid, pick the local midnight in `tz` and subtract the counter at the previous local midnight.
+  Days with 23 or 25 hours (DST changes) are handled correctly.
+- **Savings:** for every hour, `(production − feed-in) × price_buy + feed-in × price_sell`, summed over the range.
+
+Home usage = production − feed-in + grid draw. Autonomy = self-consumed production / home usage.
+
+## Checking the queries
+
+[scripts/check-queries.py](scripts/check-queries.py) runs every dashboard query against your VictoriaMetrics and
+lists errors and empty results (some are expected, e.g. "Grid down" when the grid never failed):
+
+```bash
+python3 scripts/check-queries.py http://localhost:8428 --tz Europe/Vienna
+```
+
+## Known limitations
+
+- Timezones with a non-hour UTC offset (e.g. India, +05:30) shift daily boundaries by up to 30 minutes.
+- Daily battery energy on DST change days is extrapolated from 24 hours of data.
+- The "Energy Production & Cost Summary" dashboard of the original project has not been ported.
+- Panels rely on metric names only. If you scrape several inverters into the same VictoriaMetrics, add label
+  filters to the queries.
+
+## Migrating from the original (Telegraf + InfluxDB)
+
+See [migration/influxdb-to-victoriametrics.md](migration/influxdb-to-victoriametrics.md).
 
 ## Credits
 
-### Grafana
-- [Grafana](https://github.com/grafana/grafana)
+- Dashboard and original Telegraf/InfluxDB setup: [chpro/fronius-grafana-dashboard](https://github.com/chpro/fronius-grafana-dashboard)
+- [Grafana](https://github.com/grafana/grafana), [VictoriaMetrics](https://github.com/VictoriaMetrics/VictoriaMetrics),
+  [json_exporter](https://github.com/prometheus-community/json_exporter), [forecast.solar](https://forecast.solar)
 
-#### Based on Work Of
+The original project credits:
+
 - [Powerwall Dashboard by jasonacox](https://github.com/jasonacox/Powerwall-Dashboard)
-
-### Telegraf and Influx
-- [Telegraf](https://github.com/influxdata/telegraf)
-- [InfluxDB](https://github.com/influxdata/influxdb)
-
-#### Based on Work Of
 - [Fronius-to-Influx by szymi-](https://github.com/szymi-/fronius-to-influx)
 - [Solar Panel Monitoring with Telegraf](https://gist.github.com/farmio/618ca3c1b3f335dd966b19a92acef832)
 - [How I Created a Telegraf Plugin to Monitor Solar Panels](https://thenewstack.io/how-i-created-a-telegraf-plugin-to-monitor-solar-panels/)
 
-### Readme Improvements
-Readme improved by ChatGPT: I've cleaned up the formatting and made sure headings, lists, code blocks, and links are properly formatted for clarity.
+## License
+
+MIT, see [LICENSE](LICENSE). Original work © 2023 chpro.

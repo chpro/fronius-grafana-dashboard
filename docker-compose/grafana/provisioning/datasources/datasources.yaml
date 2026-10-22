@@ -1,0 +1,15 @@
+apiVersion: 1
+datasources:
+  - name: VictoriaMetrics
+    uid: victoriametrics
+    type: victoriametrics-metrics-datasource
+    access: proxy
+    url: http://victoriametrics:8428
+    isDefault: true
+
+  - name: Sun and Moon
+    uid: sunandmoon
+    type: fetzerch-sunandmoon-datasource
+    jsonData:
+      latitude: ${LATITUDE}
+      longitude: ${LONGITUDE}

@@ -1,0 +1,65 @@
+# Imports the forecast.solar forecast into VictoriaMetrics every 15 minutes.
+# Expects a Secret "pv-forecast" with key FORECAST_URL:
+#   kubectl -n <namespace> create secret generic pv-forecast \
+#     --from-literal=FORECAST_URL='https://api.forecast.solar/estimate/watthours/<lat>/<lon>/<dec>/<az>/<kwp>?time=utc'
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pv-forecast
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 300
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          enableServiceLinks: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: fetch
+              image: alpine:3.24
+              command: ["/bin/sh", "/scripts/fetch-forecast.sh"]
+              env:
+                - name: VM_URL
+                  # adjust to your VictoriaMetrics service
+                  value: http://victoria-metrics:8428
+                - name: FORECAST_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: pv-forecast
+                      key: FORECAST_URL
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  memory: 64Mi
+              volumeMounts:
+                - name: script
+                  mountPath: /scripts
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: script
+              configMap:
+                name: pv-forecast-script
+            - name: tmp
+              emptyDir: {}

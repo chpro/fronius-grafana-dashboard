@@ -1,0 +1,132 @@
+# prometheus-community/json_exporter modules for the Fronius Solar API v1.
+#
+# Every module maps one Solar API endpoint. The scrape config passes the endpoint URL as
+# `target` and the module name as `module` (see ../victoriametrics/scrape.yml).
+#
+# Metric names follow the scheme <measurement>_<field> (e.g. powerflow_P_PV). These are exactly
+# the names Telegraf -> InfluxDB produced in the original project, so history imported from
+# InfluxDB continues seamlessly (see ../migration/influxdb-to-victoriametrics.md).
+#
+# Values that are null (e.g. inverter values at night) are skipped by json_exporter.
+# Remove modules for components you do not have (e.g. storage, ohmpilot).
+modules:
+  # /solar_api/v1/GetPowerFlowRealtimeData.fcgi
+  fronius_powerflow:
+    metrics:
+      - name: powerflow
+        type: object
+        help: Fronius power flow (site)
+        path: '{.Body.Data.Site}'
+        values:
+          P_Akku: '{.P_Akku}'
+          P_Grid: '{.P_Grid}'
+          P_Load: '{.P_Load}'
+          P_PV: '{.P_PV}'
+          rel_Autonomy: '{.rel_Autonomy}'
+          rel_SelfConsumption: '{.rel_SelfConsumption}'
+          E_Total: '{.E_Total}'
+
+  # /solar_api/v1/GetMeterRealtimeData.cgi?Scope=System
+  fronius_smartmeter:
+    metrics:
+      - name: smartmeter
+        type: object
+        help: Fronius Smart Meter (e.g. TS 65A-3)
+        path: '{.Body.Data.0}'
+        values:
+          Current_AC_Phase_1: '{.Current_AC_Phase_1}'
+          Current_AC_Phase_2: '{.Current_AC_Phase_2}'
+          Current_AC_Phase_3: '{.Current_AC_Phase_3}'
+          Current_AC_Sum: '{.Current_AC_Sum}'
+          EnergyReactive_VArAC_Sum_Consumed: '{.EnergyReactive_VArAC_Sum_Consumed}'
+          EnergyReactive_VArAC_Sum_Produced: '{.EnergyReactive_VArAC_Sum_Produced}'
+          EnergyReal_WAC_Minus_Absolute: '{.EnergyReal_WAC_Minus_Absolute}'
+          EnergyReal_WAC_Plus_Absolute: '{.EnergyReal_WAC_Plus_Absolute}'
+          EnergyReal_WAC_Sum_Consumed: '{.EnergyReal_WAC_Sum_Consumed}'
+          EnergyReal_WAC_Sum_Produced: '{.EnergyReal_WAC_Sum_Produced}'
+          PowerApparent_S_Phase_1: '{.PowerApparent_S_Phase_1}'
+          PowerApparent_S_Phase_2: '{.PowerApparent_S_Phase_2}'
+          PowerApparent_S_Phase_3: '{.PowerApparent_S_Phase_3}'
+          PowerApparent_S_Sum: '{.PowerApparent_S_Sum}'
+          PowerFactor_Phase_1: '{.PowerFactor_Phase_1}'
+          PowerFactor_Phase_2: '{.PowerFactor_Phase_2}'
+          PowerFactor_Phase_3: '{.PowerFactor_Phase_3}'
+          PowerFactor_Sum: '{.PowerFactor_Sum}'
+          PowerReactive_Q_Phase_1: '{.PowerReactive_Q_Phase_1}'
+          PowerReactive_Q_Phase_2: '{.PowerReactive_Q_Phase_2}'
+          PowerReactive_Q_Phase_3: '{.PowerReactive_Q_Phase_3}'
+          PowerReactive_Q_Sum: '{.PowerReactive_Q_Sum}'
+          PowerReal_P_Phase_1: '{.PowerReal_P_Phase_1}'
+          PowerReal_P_Phase_2: '{.PowerReal_P_Phase_2}'
+          PowerReal_P_Phase_3: '{.PowerReal_P_Phase_3}'
+          PowerReal_P_Sum: '{.PowerReal_P_Sum}'
+          Voltage_AC_PhaseToPhase_12: '{.Voltage_AC_PhaseToPhase_12}'
+          Voltage_AC_PhaseToPhase_23: '{.Voltage_AC_PhaseToPhase_23}'
+          Voltage_AC_PhaseToPhase_31: '{.Voltage_AC_PhaseToPhase_31}'
+          Voltage_AC_Phase_1: '{.Voltage_AC_Phase_1}'
+          Voltage_AC_Phase_2: '{.Voltage_AC_Phase_2}'
+          Voltage_AC_Phase_3: '{.Voltage_AC_Phase_3}'
+
+  # /solar_api/v1/GetInverterRealtimeData.cgi?Scope=Device&DeviceId=1&DataCollection=CommonInverterData
+  fronius_inverter_common:
+    metrics:
+      - name: inverter
+        type: object
+        help: Fronius inverter (common data)
+        path: '{.Body.Data}'
+        values:
+          ErrorCode: '{.DeviceStatus.ErrorCode}'
+          StatusCode: '{.DeviceStatus.StatusCode}'
+          FAC: '{.FAC.Value}'
+          IAC: '{.IAC.Value}'
+          IDC: '{.IDC.Value}'
+          IDC_2: '{.IDC_2.Value}'
+          PAC: '{.PAC.Value}'
+          SAC: '{.SAC.Value}'
+          UAC: '{.UAC.Value}'
+          UDC: '{.UDC.Value}'
+          UDC_2: '{.UDC_2.Value}'
+          TOTAL_ENERGY: '{.TOTAL_ENERGY.Value}'
+
+  # /solar_api/v1/GetInverterRealtimeData.cgi?Scope=Device&DeviceId=1&DataCollection=3PInverterData
+  fronius_inverter_3p:
+    metrics:
+      - name: inverter
+        type: object
+        help: Fronius inverter (3 phases)
+        path: '{.Body.Data}'
+        values:
+          IAC_L1: '{.IAC_L1.Value}'
+          IAC_L2: '{.IAC_L2.Value}'
+          IAC_L3: '{.IAC_L3.Value}'
+          UAC_L1: '{.UAC_L1.Value}'
+          UAC_L2: '{.UAC_L2.Value}'
+          UAC_L3: '{.UAC_L3.Value}'
+
+  # /solar_api/v1/GetStorageRealtimeData.cgi
+  fronius_storage:
+    metrics:
+      - name: storage
+        type: object
+        help: Battery (e.g. BYD Battery-Box Premium HVS)
+        path: '{.Body.Data.0.Controller}'
+        values:
+          StateOfCharge_Relative: '{.StateOfCharge_Relative}'
+          Capacity_Maximum: '{.Capacity_Maximum}'
+          DesignedCapacity: '{.DesignedCapacity}'
+          Current_DC: '{.Current_DC}'
+          Voltage_DC: '{.Voltage_DC}'
+          Temperature_Cell: '{.Temperature_Cell}'
+          Status_BatteryCell: '{.Status_BatteryCell}'
+
+  # /solar_api/v1/GetOhmPilotRealtimeData.cgi (optional, not used by the dashboard)
+  fronius_ohmpilot:
+    metrics:
+      - name: ohmpilot
+        type: object
+        help: Fronius Ohmpilot
+        path: '{.Body.Data.0}'
+        values:
+          Temperature_Channel_1: '{.Temperature_Channel_1}'
+          PowerReal_PAC_Sum: '{.PowerReal_PAC_Sum}'
+          EnergyReal_WAC_Sum_Consumed: '{.EnergyReal_WAC_Sum_Consumed}'

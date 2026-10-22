@@ -1,0 +1,29 @@
+# Kubernetes deployment of the collectors (json-exporter + forecast CronJob).
+# VictoriaMetrics and Grafana are expected to exist already, see README.md.
+#
+#   kubectl apply -k .
+#   # or remotely / from Argo CD: https://github.com/<you>/<repo>?ref=main
+#
+# Lives in the repository root so the generators can use the same config files as Docker Compose.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+
+resources:
+  - kubernetes/json-exporter.yaml
+  - kubernetes/pv-forecast-cronjob.yaml
+
+configMapGenerator:
+  - name: json-exporter-config
+    files:
+      - config.yml=json-exporter/config.yml
+  - name: pv-forecast-script
+    files:
+      - forecast/fetch-forecast.sh
+  # Grafana dashboard for the Grafana sidecar (kube-prometheus-stack / grafana helm chart)
+  - name: grafana-dashboard-fronius
+    files:
+      - fronius-pv.json=grafana/dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
