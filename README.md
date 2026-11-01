@@ -24,6 +24,8 @@ Fronius systems. No support or warranty is provided. Use at your own risk.
   midnight in the configured timezone.
 - **Energy prices as dashboard variables** instead of an InfluxDB bucket. Savings are calculated per hour, so
   price changes are applied exactly when they take effect.
+- **Wattpilot & Ohmpilot:** energy into the car and into hot water, split into PV and grid
+  (see [Wattpilot and Ohmpilot](#wattpilot-and-ohmpilot)).
 - **Docker Compose and Kubernetes** deployment included.
 
 ## Architecture
@@ -65,31 +67,43 @@ cp .env.example .env    # set FRONIUS_HOST, LATITUDE, LONGITUDE, GRAFANA_ADMIN_P
 docker compose up -d
 # with forecast (set FORECAST_URL in .env first):
 docker compose --profile forecast up -d
+# with Wattpilot (set WATTPILOT_HOST and WATTPILOT_PASSWORD in .env first):
+docker compose --profile wattpilot up -d
 ```
+
+Profiles can be combined (`--profile forecast --profile wattpilot`).
 
 Open Grafana at <http://localhost:3000> and the dashboard **Fronius PV (VictoriaMetrics)**.
 Then set timezone and prices, see [Dashboard settings](#dashboard-settings).
 
 ## Kubernetes
 
-The repository root is a kustomization that deploys json-exporter, the forecast CronJob and the dashboard as a
-ConfigMap for the Grafana sidecar (label `grafana_dashboard: "1"`, as used by kube-prometheus-stack and the
+The repository root is a kustomization that deploys json-exporter, the Wattpilot exporter, the forecast CronJob
+and the dashboard as a ConfigMap for the Grafana sidecar (label `grafana_dashboard: "1"`, as used by kube-prometheus-stack and the
 Grafana Helm chart). VictoriaMetrics and Grafana are expected to exist already.
 
 ```bash
 kubectl create namespace monitoring
 kubectl -n monitoring create secret generic pv-forecast \
   --from-literal=FORECAST_URL='https://api.forecast.solar/estimate/watthours/<lat>/<lon>/<dec>/<az>/<kwp>?time=utc'
+kubectl -n monitoring create secret generic wattpilot --from-literal=WATTPILOT_PASSWORD='<password>'
 kubectl apply --server-side -k .
 ```
 
+Without a Wattpilot, remove `kubernetes/wattpilot-exporter.yaml` and the `wattpilot-exporter-script` generator
+from [kustomization.yaml](kustomization.yaml) (and skip the `wattpilot` secret).
+
 For Argo CD or Flux, point an application at this repository (or a fork of it) and override the namespace with
 an overlay if needed. Adjust `VM_URL` in [kubernetes/pv-forecast-cronjob.yaml](kubernetes/pv-forecast-cronjob.yaml)
-to your VictoriaMetrics service.
+to your VictoriaMetrics service and `WATTPILOT_HOST` in
+[kubernetes/wattpilot-exporter.yaml](kubernetes/wattpilot-exporter.yaml) to your Wattpilot.
 
-Then add the scrape job from [victoriametrics/scrape.yml](victoriametrics/scrape.yml) to your VictoriaMetrics or
-vmagent config, with `json-exporter:7979` replaced by `json-exporter.monitoring.svc:7979`, and set the
-environment variable `FRONIUS_HOST` on VictoriaMetrics/vmagent (or replace `%{FRONIUS_HOST}` directly).
+Then add the scrape jobs from [victoriametrics/scrape.yml](victoriametrics/scrape.yml) to your VictoriaMetrics or
+vmagent config, with `json-exporter:7979` replaced by `json-exporter.monitoring.svc:7979` and
+`wattpilot-exporter:9101` by `wattpilot-exporter.monitoring.svc:9101`. Set the environment variable
+`FRONIUS_HOST` on VictoriaMetrics/vmagent (or replace `%{FRONIUS_HOST}` directly) and add
+`-search.maxPointsSubqueryPerTimeseries=1100000` to VictoriaMetrics (see
+[Wattpilot and Ohmpilot](#wattpilot-and-ohmpilot)).
 
 ## Using an existing VictoriaMetrics and Grafana
 
@@ -97,29 +111,67 @@ environment variable `FRONIUS_HOST` on VictoriaMetrics/vmagent (or replace `%{FR
 2. Add the scrape job from [victoriametrics/scrape.yml](victoriametrics/scrape.yml).
 3. For the forecast: start VictoriaMetrics with `-futureRetention=7d` (forecast values have timestamps in the
    future) and run [forecast/fetch-forecast.sh](forecast/fetch-forecast.sh) every 15 minutes.
-4. Import [grafana/dashboard.json](grafana/dashboard.json) (Dashboards → New → Import) and select your
+4. Optional: run [wattpilot-exporter/wattpilot_exporter.py](wattpilot-exporter/wattpilot_exporter.py) for the
+   Wattpilot and start VictoriaMetrics with `-search.maxPointsSubqueryPerTimeseries=1100000`, see
+   [Wattpilot and Ohmpilot](#wattpilot-and-ohmpilot).
+5. Import [grafana/dashboard.json](grafana/dashboard.json) (Dashboards → New → Import) and select your
    VictoriaMetrics datasource in the variable at the top of the dashboard.
 
 ## Wattpilot and Ohmpilot
 
 The row "Wattpilot & Ohmpilot" shows how much energy went into the car (Wattpilot) and into hot water
-(Ohmpilot), split into **PV** and **grid**, for the selected time range and per day.
+(Ohmpilot), split into **PV** and **grid**, for the selected time range and per day, plus live power and the
+boiler temperature. Each device works on its own; without one of them its panels stay at 0.
 
-- **Ohmpilot:** nothing to do if the `fronius_ohmpilot` target in [victoriametrics/scrape.yml](victoriametrics/scrape.yml)
-  is active (the inverter forwards the Ohmpilot values).
-- **Wattpilot:** the Wattpilot has no HTTP API, only a password protected WebSocket.
-  [wattpilot-exporter/wattpilot_exporter.py](wattpilot-exporter/wattpilot_exporter.py) (Python standard library
-  only) keeps that connection open and serves `wattpilot_*` metrics on port 9101. Use the password of the
-  Solar.wattpilot app. Tested with Wattpilot firmware 42.x (`pbkdf2` login); the bcrypt login of the Wattpilot
-  Flex is not supported.
-  - Docker Compose: set `WATTPILOT_HOST` and `WATTPILOT_PASSWORD` in `.env`, then
-    `docker compose --profile wattpilot up -d`.
-  - Kubernetes: `kubectl -n monitoring create secret generic wattpilot --from-literal=WATTPILOT_PASSWORD='<password>'`,
-    set `WATTPILOT_HOST` in [kubernetes/wattpilot-exporter.yaml](kubernetes/wattpilot-exporter.yaml) and add the
-    `wattpilot` job from [victoriametrics/scrape.yml](victoriametrics/scrape.yml) (target
-    `wattpilot-exporter.monitoring.svc:9101`).
+### Ohmpilot
 
-**How the PV/grid split is calculated:** no device measures where its energy comes from, so the split is estimated
+Nothing to do if the `fronius_ohmpilot` target in [victoriametrics/scrape.yml](victoriametrics/scrape.yml) is
+active: the inverter forwards the Ohmpilot values (`ohmpilot_PowerReal_PAC_Sum`, `ohmpilot_EnergyReal_WAC_Sum_Consumed`,
+`ohmpilot_Temperature_Channel_1`). History imported from InfluxDB is used as well.
+
+### Wattpilot
+
+The Wattpilot has no HTTP API (its IP answers every URL with 404), only a password protected WebSocket at
+`ws://<wattpilot>/ws`. [wattpilot-exporter/wattpilot_exporter.py](wattpilot-exporter/wattpilot_exporter.py)
+(Python standard library only, no own image) keeps that connection open and serves the last values on
+`:9101/metrics`. Data is collected from the start of the exporter; the Wattpilot does not provide history.
+
+- **Password:** there is no user name. The password is the one set during setup in the Solar.wattpilot app
+  (on some installations the same as for the inverter). If it is lost, reset it in the app with the reset card.
+- **Firmware:** tested with Wattpilot firmware 42.x (`pbkdf2` login). The bcrypt login of the Wattpilot Flex
+  is not supported.
+- **Docker Compose:** set `WATTPILOT_HOST` and `WATTPILOT_PASSWORD` in `.env`, then
+  `docker compose --profile wattpilot up -d`.
+- **Kubernetes:** see [Kubernetes](#kubernetes).
+- **Test locally** (the password is read without echo):
+
+  ```bash
+  read -s "PW?Wattpilot password: "   # bash: read -s -p "Wattpilot password: " PW
+  WATTPILOT_PASSWORD=$PW WATTPILOT_HOST=<wattpilot> python3 wattpilot-exporter/wattpilot_exporter.py
+  curl localhost:9101/metrics   # in a second terminal
+  ```
+
+  The log shows `connected to <name> (firmware ...)` or `login failed`. After a failed login the exporter waits
+  5 minutes before the next attempt. Stop the test before deploying: the Wattpilot accepts only a few
+  connections.
+
+| Metric | Meaning |
+|---|---|
+| `wattpilot_up` | 1 if logged in and data is current |
+| `wattpilot_power`, `wattpilot_power_L1..L3` | charging power in W |
+| `wattpilot_voltage_L1..L3`, `wattpilot_current_L1..L3` | voltage in V, current in A |
+| `wattpilot_energy_total` | energy charged in total in Wh |
+| `wattpilot_energy_session` | energy charged since the car was connected in Wh |
+| `wattpilot_car_state` | 1 idle, 2 charging, 3 waiting for car, 4 complete (also shown while Eco mode pauses), 5 error |
+| `wattpilot_charging_allowed` | 1 if the car may charge right now |
+| `wattpilot_current_limit` | requested charging current in A |
+| `wattpilot_logic_mode` | 3 default, 4 eco (PV surplus), 5 next trip |
+| `wattpilot_error` | error code, 0 = no error |
+| `wattpilot_info` | labels `serial`, `friendly_name`, `version`, `devicetype` |
+
+### PV/grid split
+
+No device measures where its energy comes from, so the split is estimated
 per minute. Grid import at the grid connection point (`powerflow_P_Grid > 0`) is attributed to Wattpilot and
 Ohmpilot first, up to their combined power, and divided between both by power. The rest of their consumption
 counts as PV. Consequences:
@@ -164,6 +216,8 @@ Compose setup) or edit the defaults in `grafana/dashboard.json`.
 - **Daily bars:** VictoriaMetrics aligns daily steps to 00:00 UTC. The queries therefore evaluate the counters
   on an hourly grid, pick the local midnight in `tz` and subtract the counter at the previous local midnight.
   Days with 23 or 25 hours (DST changes) are handled correctly.
+- **Wattpilot/Ohmpilot:** integrated from the power values per minute, see
+  [PV/grid split](#pvgrid-split).
 - **Savings:** for every hour, `(production − feed-in) × price_buy + feed-in × price_sell`, summed over the range.
 
 Home usage = production − feed-in + grid draw. Autonomy = self-consumed production / home usage.
@@ -171,7 +225,8 @@ Home usage = production − feed-in + grid draw. Autonomy = self-consumed produc
 ## Checking the queries
 
 [scripts/check-queries.py](scripts/check-queries.py) runs every dashboard query against your VictoriaMetrics and
-lists errors and empty results (some are expected, e.g. "Grid down" when the grid never failed):
+lists errors and empty results (some are expected, e.g. "Grid down" when the grid never failed, or "Wattpilot" without a running
+wattpilot-exporter):
 
 ```bash
 python3 scripts/check-queries.py http://localhost:8428 --tz Europe/Vienna
