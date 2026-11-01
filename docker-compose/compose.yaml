@@ -3,6 +3,7 @@
 #   cp .env.example .env   # adjust values
 #   docker compose up -d                       # without forecast
 #   docker compose --profile forecast up -d    # with forecast (needs FORECAST_URL)
+#   docker compose --profile wattpilot up -d   # with Wattpilot (needs WATTPILOT_HOST/PASSWORD)
 #
 # Grafana: http://localhost:3000 (admin / GRAFANA_ADMIN_PASSWORD), dashboard "Fronius PV (VictoriaMetrics)"
 name: fronius
@@ -24,6 +25,8 @@ services:
       - -promscrape.configCheckInterval=1m
       # forecast.solar delivers values with timestamps in the future
       - -futureRetention=7d
+      # Wattpilot/Ohmpilot PV share over more than ~69 days (1 minute subqueries)
+      - -search.maxPointsSubqueryPerTimeseries=1100000
     environment:
       FRONIUS_HOST: ${FRONIUS_HOST:?set FRONIUS_HOST in .env}
     volumes:
@@ -48,6 +51,18 @@ services:
       - "3000:3000"
     depends_on:
       - victoriametrics
+    restart: unless-stopped
+
+  wattpilot-exporter:
+    image: python:3.14-alpine
+    profiles: [wattpilot]
+    command: ["python", "/app/wattpilot_exporter.py"]
+    environment:
+      WATTPILOT_HOST: ${WATTPILOT_HOST:-}
+      WATTPILOT_PASSWORD: ${WATTPILOT_PASSWORD:-}
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - ../wattpilot-exporter/wattpilot_exporter.py:/app/wattpilot_exporter.py:ro
     restart: unless-stopped
 
   forecast:

@@ -34,7 +34,11 @@ Fronius inverter ──(Solar API v1, HTTP/JSON)──> json-exporter :7979
                                                       │ scrape /probe every 60s
                                                       │
 forecast.solar ──> fetch-forecast.sh ──(CSV import)──> VictoriaMetrics :8428 ──> Grafana
+                                                      │
+Fronius Wattpilot ──(WebSocket)──> wattpilot-exporter :9101 (optional)
 ```
+
+The Ohmpilot is read through the inverter's Solar API (json-exporter module `fronius_ohmpilot`).
 
 ## Requirements
 
@@ -48,6 +52,8 @@ forecast.solar ──> fetch-forecast.sh ──(CSV import)──> VictoriaMetri
   - [Sun and Moon](https://grafana.com/grafana/plugins/fetzerch-sunandmoon-datasource/) (sun altitude in the
     "Energy Usage" panel), configured with your latitude/longitude
 - Optional: a [forecast.solar](https://forecast.solar) URL for the "Expected yield" panel.
+- Optional: Fronius **Wattpilot** and/or **Ohmpilot** for the "Wattpilot & Ohmpilot" row, see
+  [Wattpilot and Ohmpilot](#wattpilot-and-ohmpilot).
 
 ## Quick start with Docker Compose
 
@@ -93,6 +99,37 @@ environment variable `FRONIUS_HOST` on VictoriaMetrics/vmagent (or replace `%{FR
    future) and run [forecast/fetch-forecast.sh](forecast/fetch-forecast.sh) every 15 minutes.
 4. Import [grafana/dashboard.json](grafana/dashboard.json) (Dashboards → New → Import) and select your
    VictoriaMetrics datasource in the variable at the top of the dashboard.
+
+## Wattpilot and Ohmpilot
+
+The row "Wattpilot & Ohmpilot" shows how much energy went into the car (Wattpilot) and into hot water
+(Ohmpilot), split into **PV** and **grid**, for the selected time range and per day.
+
+- **Ohmpilot:** nothing to do if the `fronius_ohmpilot` target in [victoriametrics/scrape.yml](victoriametrics/scrape.yml)
+  is active (the inverter forwards the Ohmpilot values).
+- **Wattpilot:** the Wattpilot has no HTTP API, only a password protected WebSocket.
+  [wattpilot-exporter/wattpilot_exporter.py](wattpilot-exporter/wattpilot_exporter.py) (Python standard library
+  only) keeps that connection open and serves `wattpilot_*` metrics on port 9101. Use the password of the
+  Solar.wattpilot app. Tested with Wattpilot firmware 42.x (`pbkdf2` login); the bcrypt login of the Wattpilot
+  Flex is not supported.
+  - Docker Compose: set `WATTPILOT_HOST` and `WATTPILOT_PASSWORD` in `.env`, then
+    `docker compose --profile wattpilot up -d`.
+  - Kubernetes: `kubectl -n monitoring create secret generic wattpilot --from-literal=WATTPILOT_PASSWORD='<password>'`,
+    set `WATTPILOT_HOST` in [kubernetes/wattpilot-exporter.yaml](kubernetes/wattpilot-exporter.yaml) and add the
+    `wattpilot` job from [victoriametrics/scrape.yml](victoriametrics/scrape.yml) (target
+    `wattpilot-exporter.monitoring.svc:9101`).
+
+**How the PV/grid split is calculated:** no device measures where its energy comes from, so the split is estimated
+per minute. Grid import at the grid connection point (`powerflow_P_Grid > 0`) is attributed to Wattpilot and
+Ohmpilot first, up to their combined power, and divided between both by power. The rest of their consumption
+counts as PV. Consequences:
+
+- Energy from the **battery** counts as PV (stored solar energy).
+- A **balcony power plant** or any other generator behind the grid meter is included in PV automatically,
+  because it reduces the measured grid import.
+- Short load peaks within a minute are not visible.
+- Selected time ranges longer than about 69 days need `-search.maxPointsSubqueryPerTimeseries=1100000` on
+  VictoriaMetrics (already set in the Compose setup), otherwise the panels show an error.
 
 ## Dashboard settings
 
@@ -143,7 +180,8 @@ python3 scripts/check-queries.py http://localhost:8428 --tz Europe/Vienna
 ## Known limitations
 
 - Timezones with a non-hour UTC offset (e.g. India, +05:30) shift daily boundaries by up to 30 minutes.
-- Daily battery energy on DST change days is extrapolated from 24 hours of data.
+- Daily battery energy on DST change days is extrapolated from 24 hours of data. Daily Wattpilot/Ohmpilot
+  energy on these days covers 24 hours instead of 23/25.
 - The "Energy Production & Cost Summary" dashboard of the original project has not been ported.
 - Panels rely on metric names only. If you scrape several inverters into the same VictoriaMetrics, add label
   filters to the queries.

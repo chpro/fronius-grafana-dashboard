@@ -119,7 +119,7 @@ modules:
           Temperature_Cell: '{.Temperature_Cell}'
           Status_BatteryCell: '{.Status_BatteryCell}'
 
-  # /solar_api/v1/GetOhmPilotRealtimeData.cgi (optional, not used by the dashboard)
+  # /solar_api/v1/GetOhmPilotRealtimeData.cgi (optional, row "Wattpilot & Ohmpilot")
   fronius_ohmpilot:
     metrics:
       - name: ohmpilot

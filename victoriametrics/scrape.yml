@@ -30,3 +30,13 @@ scrape_configs:
         replacement: fronius
       - target_label: __address__
         replacement: json-exporter:7979
+
+  # Fronius Wattpilot via wattpilot-exporter (../wattpilot-exporter). Remove if you have no Wattpilot.
+  # Kubernetes: wattpilot-exporter.<namespace>.svc:9101
+  - job_name: wattpilot
+    scrape_interval: 60s
+    static_configs:
+      - targets: ["wattpilot-exporter:9101"]
+    relabel_configs:
+      - target_label: instance
+        replacement: wattpilot

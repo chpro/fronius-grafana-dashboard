@@ -2424,6 +2424,1042 @@
     },
     {
       "type": "row",
+      "id": 113,
+      "title": "Wattpilot & Ohmpilot",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "panels": []
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Energy for the selected time range, integrated from the power values (1 minute resolution). Grid import at the grid connection point is attributed to Wattpilot and Ohmpilot first (up to their combined power, split between both by power); the rest counts as PV. Energy from the battery counts as PV (stored solar energy). A balcony power plant behind the grid meter is included as PV as well.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "text"
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 31
+      },
+      "id": 114,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((wp - lg * wp / clamp_min(l, 1))[$__range:1m]) / 60",
+          "legendFormat": "From PV",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((lg * wp / clamp_min(l, 1))[$__range:1m]) / 60",
+          "legendFormat": "From Grid",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((wp)[$__range:1m]) / 60",
+          "legendFormat": "Total",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "title": "Car charging",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Energy for the selected time range, integrated from the power values (1 minute resolution). Grid import at the grid connection point is attributed to Wattpilot and Ohmpilot first (up to their combined power, split between both by power); the rest counts as PV. Energy from the battery counts as PV (stored solar energy). A balcony power plant behind the grid meter is included as PV as well.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 4,
+        "y": 31
+      },
+      "id": 115,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((wp - lg * wp / clamp_min(l, 1))[$__range:1m]) / 60",
+          "legendFormat": "From PV",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((lg * wp / clamp_min(l, 1))[$__range:1m]) / 60",
+          "legendFormat": "From Grid",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "title": "Car charging: PV share",
+      "transformations": [],
+      "type": "piechart",
+      "transparent": true
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Energy for the selected time range, integrated from the power values (1 minute resolution). Grid import at the grid connection point is attributed to Wattpilot and Ohmpilot first (up to their combined power, split between both by power); the rest counts as PV. Energy from the battery counts as PV (stored solar energy). A balcony power plant behind the grid meter is included as PV as well.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "text"
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 8,
+        "y": 31
+      },
+      "id": 116,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((op - lg * op / clamp_min(l, 1))[$__range:1m]) / 60",
+          "legendFormat": "From PV",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((lg * op / clamp_min(l, 1))[$__range:1m]) / 60",
+          "legendFormat": "From Grid",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((op)[$__range:1m]) / 60",
+          "legendFormat": "Total",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "title": "Hot water",
+      "transformations": [],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Energy for the selected time range, integrated from the power values (1 minute resolution). Grid import at the grid connection point is attributed to Wattpilot and Ohmpilot first (up to their combined power, split between both by power); the rest counts as PV. Energy from the battery counts as PV (stored solar energy). A balcony power plant behind the grid meter is included as PV as well.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 12,
+        "y": 31
+      },
+      "id": 117,
+      "options": {
+        "displayLabels": [
+          "percent"
+        ],
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((op - lg * op / clamp_min(l, 1))[$__range:1m]) / 60",
+          "legendFormat": "From PV",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((lg * op / clamp_min(l, 1))[$__range:1m]) / 60",
+          "legendFormat": "From Grid",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "title": "Hot water: PV share",
+      "transformations": [],
+      "type": "piechart",
+      "transparent": true
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wattpilot"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ohmpilot"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Boiler temperature"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "celsius"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 31
+      },
+      "id": 118,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "avg(avg_over_time(wattpilot_power[$__interval]))",
+          "legendFormat": "Wattpilot",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1m"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "avg(avg_over_time(ohmpilot_PowerReal_PAC_Sum[$__interval]))",
+          "legendFormat": "Ohmpilot",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1m"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "avg(avg_over_time(ohmpilot_Temperature_Channel_1[$__interval]))",
+          "legendFormat": "Boiler temperature",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1m"
+        }
+      ],
+      "title": "Wattpilot & Ohmpilot power",
+      "transformations": [],
+      "type": "timeseries",
+      "transparent": true
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Energy for each day, integrated from the power values (1 minute resolution). Grid import at the grid connection point is attributed to Wattpilot and Ohmpilot first (up to their combined power, split between both by power); the rest counts as PV. Energy from the battery counts as PV (stored solar energy). A balcony power plant behind the grid meter is included as PV as well.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 100,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 0,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 39
+      },
+      "id": 119,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) last_over_time(((sum_over_time((wp - lg * wp / clamp_min(l, 1))[1d:1m]) / 60) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "legendFormat": "From PV",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1d"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) last_over_time(((sum_over_time((lg * wp / clamp_min(l, 1))[1d:1m]) / 60) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "legendFormat": "From Grid",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1d"
+        }
+      ],
+      "title": "Car charging per day",
+      "transformations": [],
+      "type": "timeseries",
+      "transparent": true,
+      "timeFrom": "1M"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Energy for each day, integrated from the power values (1 minute resolution). Grid import at the grid connection point is attributed to Wattpilot and Ohmpilot first (up to their combined power, split between both by power); the rest counts as PV. Energy from the battery counts as PV (stored solar energy). A balcony power plant behind the grid meter is included as PV as well.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              }
+            ]
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 100,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 0,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "From Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 39
+      },
+      "id": 120,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) last_over_time(((sum_over_time((op - lg * op / clamp_min(l, 1))[1d:1m]) / 60) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "legendFormat": "From PV",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1d"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) last_over_time(((sum_over_time((lg * op / clamp_min(l, 1))[1d:1m]) / 60) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "legendFormat": "From Grid",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1d"
+        }
+      ],
+      "title": "Hot water per day",
+      "transformations": [],
+      "type": "timeseries",
+      "transparent": true,
+      "timeFrom": "1M"
+    },
+    {
+      "type": "row",
       "id": 80,
       "title": "Estimated savings",
       "collapsed": false,
@@ -2431,7 +3467,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 47
       },
       "panels": []
     },
@@ -2514,7 +3550,7 @@
         "h": 8,
         "w": 4,
         "x": 0,
-        "y": 31
+        "y": 48
       },
       "id": 97,
       "options": {
@@ -2662,7 +3698,7 @@
         "h": 8,
         "w": 4,
         "x": 4,
-        "y": 31
+        "y": 48
       },
       "id": 98,
       "options": {
@@ -2812,7 +3848,7 @@
         "h": 8,
         "w": 4,
         "x": 8,
-        "y": 31
+        "y": 48
       },
       "id": 104,
       "options": {
@@ -2962,7 +3998,7 @@
         "h": 8,
         "w": 4,
         "x": 12,
-        "y": 31
+        "y": 48
       },
       "id": 99,
       "options": {
@@ -3113,7 +4149,7 @@
         "h": 8,
         "w": 4,
         "x": 16,
-        "y": 31
+        "y": 48
       },
       "id": 100,
       "options": {
@@ -3264,7 +4300,7 @@
         "h": 8,
         "w": 4,
         "x": 20,
-        "y": 31
+        "y": 48
       },
       "id": 102,
       "options": {
@@ -3342,7 +4378,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 56
       },
       "panels": []
     },
@@ -3404,7 +4440,7 @@
         "h": 8,
         "w": 4,
         "x": 0,
-        "y": 40
+        "y": 57
       },
       "id": 82,
       "options": {
@@ -3530,7 +4566,7 @@
         "h": 8,
         "w": 4,
         "x": 4,
-        "y": 40
+        "y": 57
       },
       "id": 86,
       "options": {
@@ -3656,7 +4692,7 @@
         "h": 8,
         "w": 4,
         "x": 8,
-        "y": 40
+        "y": 57
       },
       "id": 106,
       "options": {
@@ -3782,7 +4818,7 @@
         "h": 8,
         "w": 4,
         "x": 12,
-        "y": 40
+        "y": 57
       },
       "id": 88,
       "options": {
@@ -3907,7 +4943,7 @@
         "h": 8,
         "w": 4,
         "x": 16,
-        "y": 40
+        "y": 57
       },
       "id": 92,
       "options": {
@@ -4033,7 +5069,7 @@
         "h": 8,
         "w": 4,
         "x": 0,
-        "y": 48
+        "y": 65
       },
       "id": 108,
       "options": {
@@ -4159,7 +5195,7 @@
         "h": 8,
         "w": 4,
         "x": 4,
-        "y": 48
+        "y": 65
       },
       "id": 109,
       "options": {
@@ -4285,7 +5321,7 @@
         "h": 8,
         "w": 4,
         "x": 8,
-        "y": 48
+        "y": 65
       },
       "id": 110,
       "options": {
@@ -4411,7 +5447,7 @@
         "h": 8,
         "w": 4,
         "x": 12,
-        "y": 48
+        "y": 65
       },
       "id": 111,
       "options": {
@@ -4536,7 +5572,7 @@
         "h": 8,
         "w": 4,
         "x": 16,
-        "y": 48
+        "y": 65
       },
       "id": 112,
       "options": {
@@ -4613,7 +5649,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 56
+        "y": 73
       },
       "panels": []
     },
@@ -4681,7 +5717,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 57
+        "y": 74
       },
       "id": 25,
       "options": {
@@ -4848,7 +5884,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 57
+        "y": 74
       },
       "id": 24,
       "options": {
@@ -5011,7 +6047,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 65
+        "y": 82
       },
       "id": 26,
       "options": {
@@ -5162,7 +6198,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 65
+        "y": 82
       },
       "id": 27,
       "options": {
@@ -5385,7 +6421,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 73
+        "y": 90
       },
       "id": 74,
       "options": {
@@ -5545,7 +6581,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 79
+        "y": 96
       },
       "id": 81,
       "options": {
@@ -5775,7 +6811,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 79
+        "y": 96
       },
       "id": 103,
       "options": {
@@ -5961,7 +6997,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 92
+        "y": 109
       },
       "panels": []
     },
@@ -6031,7 +7067,7 @@
         "h": 5,
         "w": 8,
         "x": 0,
-        "y": 93
+        "y": 110
       },
       "id": 32,
       "options": {
@@ -6166,7 +7202,7 @@
         "h": 5,
         "w": 8,
         "x": 8,
-        "y": 93
+        "y": 110
       },
       "id": 62,
       "options": {
@@ -6317,7 +7353,7 @@
         "h": 5,
         "w": 8,
         "x": 16,
-        "y": 93
+        "y": 110
       },
       "id": 63,
       "options": {
@@ -6552,7 +7588,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 98
+        "y": 115
       },
       "id": 34,
       "options": {
@@ -6674,7 +7710,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 98
+        "y": 115
       },
       "id": 35,
       "options": {
@@ -6797,7 +7833,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 104
+        "y": 121
       },
       "id": 38,
       "options": {
@@ -6920,7 +7956,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 109
+        "y": 126
       },
       "id": 61,
       "options": {
@@ -7113,7 +8149,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 114
+        "y": 131
       },
       "id": 77,
       "options": {
@@ -7403,7 +8439,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 119
+        "y": 136
       },
       "id": 55,
       "options": {

@@ -1,0 +1,84 @@
+# Exporter for the Fronius Wattpilot (WebSocket -> Prometheus metrics on :9101/metrics).
+# Expects a Secret "wattpilot" with key WATTPILOT_PASSWORD:
+#   kubectl -n <namespace> create secret generic wattpilot --from-literal=WATTPILOT_PASSWORD='<password>'
+# Remove this file from kustomization.yaml if you have no Wattpilot.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wattpilot-exporter
+  labels:
+    app.kubernetes.io/name: wattpilot-exporter
+spec:
+  replicas: 1 # the Wattpilot accepts only a few WebSocket connections
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wattpilot-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wattpilot-exporter
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: wattpilot-exporter
+          image: python:3.14-alpine
+          command: ["python", "/app/wattpilot_exporter.py"]
+          env:
+            - name: WATTPILOT_HOST
+              # adjust to your Wattpilot
+              value: 192.168.1.50
+            - name: WATTPILOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wattpilot
+                  key: WATTPILOT_PASSWORD
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+          ports:
+            - name: http
+              containerPort: 9101
+          readinessProbe:
+            tcpSocket:
+              port: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 24Mi
+            limits:
+              memory: 64Mi
+          volumeMounts:
+            - name: script
+              mountPath: /app
+              readOnly: true
+      volumes:
+        - name: script
+          configMap:
+            name: wattpilot-exporter-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wattpilot-exporter
+  labels:
+    app.kubernetes.io/name: wattpilot-exporter
+spec:
+  selector:
+    app.kubernetes.io/name: wattpilot-exporter
+  ports:
+    - name: http
+      port: 9101
+      targetPort: http

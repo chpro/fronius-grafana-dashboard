@@ -1,4 +1,4 @@
-# Kubernetes deployment of the collectors (json-exporter + forecast CronJob).
+# Kubernetes deployment of the collectors (json-exporter, Wattpilot exporter, forecast CronJob).
 # VictoriaMetrics and Grafana are expected to exist already, see README.md.
 #
 #   kubectl apply -k .
@@ -12,11 +12,15 @@ namespace: monitoring
 resources:
   - kubernetes/json-exporter.yaml
   - kubernetes/pv-forecast-cronjob.yaml
+  - kubernetes/wattpilot-exporter.yaml # remove if you have no Wattpilot
 
 configMapGenerator:
   - name: json-exporter-config
     files:
       - config.yml=json-exporter/config.yml
+  - name: wattpilot-exporter-script
+    files:
+      - wattpilot-exporter/wattpilot_exporter.py
   - name: pv-forecast-script
     files:
       - forecast/fetch-forecast.sh
