@@ -393,6 +393,21 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balcony"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
@@ -441,6 +456,20 @@
           },
           "expr": "max(max_over_time(powerflow_P_PV[$__interval])) + (clamp_min(-min(min_over_time(balcony_apower[$__interval])), 0) or vector(0))",
           "legendFormat": "Solar Energy",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1m"
+        },
+        {
+          "refId": "K",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "clamp_min(-min(min_over_time(balcony_apower[$__interval])), 0)",
+          "legendFormat": "Balcony",
           "instant": false,
           "range": true,
           "editorMode": "code",
@@ -566,7 +595,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "",
+      "description": "Solar Energy = Fronius inverter + balcony power plant; Balcony = balcony share.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -663,6 +692,29 @@
                 "value": 100
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balcony"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 800
+              }
+            ]
           }
         ]
       },
@@ -753,6 +805,19 @@
           },
           "expr": "max(last_over_time(storage_StateOfCharge_Relative[5m]))",
           "legendFormat": "Charge",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "clamp_min(-min(last_over_time(balcony_apower[5m])), 0)",
+          "legendFormat": "Balcony",
           "instant": true,
           "range": false,
           "editorMode": "code",

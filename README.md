@@ -207,7 +207,8 @@ The dashboard uses `balcony_ret_aenergy_total` (Wh, via `increase()`, so counter
 - Production, home usage, local consumption, autonomy, self consumption and savings include the balcony
   energy. "Local Energy Production" (daily bars) shows Fronius and balcony stacked, the new stat
   "Balcony Production" shows the balcony share.
-- Live panels: solar power and home usage include the balcony power. The autonomy line in "Energy Usage" is
+- Live panels: solar power and home usage include the balcony power. The balcony power is also shown on its
+  own (orange line "Balcony" in "Energy Usage", gauge "Balcony" in "Power flow"). The autonomy line in "Energy Usage" is
   calculated as `1 − grid import / home usage` instead of the inverter's `rel_Autonomy`.
 - Not included: "Total solar energy production" (lifetime counter of the inverter) and the "grouped by kW"
   panels (inverter power only).
