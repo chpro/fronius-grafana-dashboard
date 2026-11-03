@@ -130,3 +130,25 @@ modules:
           Temperature_Channel_1: '{.Temperature_Channel_1}'
           PowerReal_PAC_Sum: '{.PowerReal_PAC_Sum}'
           EnergyReal_WAC_Sum_Consumed: '{.EnergyReal_WAC_Sum_Consumed}'
+
+  # Balcony power plant measured by a Shelly Gen2+/Gen3 plug (optional), e.g. Shelly Plug S Gen3:
+  # http://<shelly>/rpc/Switch.GetStatus?id=0. The plug sits between inverter and socket, so feed-in shows up
+  # as negative power and in the "returned energy" counter (Wh). The dashboard uses balcony_apower and
+  # balcony_ret_aenergy_total.
+  shelly_balcony:
+    metrics:
+      - name: balcony_apower
+        help: Balcony power plant, active power in W (negative = feed-in)
+        path: '{.apower}'
+      - name: balcony_ret_aenergy_total
+        help: Balcony power plant, energy fed in in Wh (counter, may reset)
+        path: '{.ret_aenergy.total}'
+      - name: balcony_aenergy_total
+        help: Balcony power plant, energy counter of the plug in Wh
+        path: '{.aenergy.total}'
+      - name: balcony_voltage
+        help: Balcony power plant, voltage in V
+        path: '{.voltage}'
+      - name: balcony_temperature
+        help: Temperature of the Shelly plug in °C
+        path: '{.temperature.tC}'

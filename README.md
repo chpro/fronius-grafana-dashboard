@@ -24,6 +24,8 @@ Fronius systems. No support or warranty is provided. Use at your own risk.
   midnight in the configured timezone.
 - **Energy prices as dashboard variables** instead of an InfluxDB bucket. Savings are calculated per hour, so
   price changes are applied exactly when they take effect.
+- **Balcony power plant** (optional, measured by a Shelly plug) is added to production, home usage, autonomy
+  and savings (see [Balcony power plant](#balcony-power-plant)).
 - **Wattpilot & Ohmpilot:** energy into the car and into hot water, split into PV and grid
   (see [Wattpilot and Ohmpilot](#wattpilot-and-ohmpilot)).
 - **Docker Compose and Kubernetes** deployment included.
@@ -38,6 +40,7 @@ Fronius inverter ──(Solar API v1, HTTP/JSON)──> json-exporter :7979
 forecast.solar ──> fetch-forecast.sh ──(CSV import)──> VictoriaMetrics :8428 ──> Grafana
                                                       │
 Fronius Wattpilot ──(WebSocket)──> wattpilot-exporter :9101 (optional)
+Shelly plug (balcony power plant) ──(HTTP/JSON)──> json-exporter (optional)
 ```
 
 The Ohmpilot is read through the inverter's Solar API (json-exporter module `fronius_ohmpilot`).
@@ -54,6 +57,8 @@ The Ohmpilot is read through the inverter's Solar API (json-exporter module `fro
   - [Sun and Moon](https://grafana.com/grafana/plugins/fetzerch-sunandmoon-datasource/) (sun altitude in the
     "Energy Usage" panel), configured with your latitude/longitude
 - Optional: a [forecast.solar](https://forecast.solar) URL for the "Expected yield" panel.
+- Optional: a **balcony power plant** behind a Shelly Gen2+/Gen3 plug, see
+  [Balcony power plant](#balcony-power-plant).
 - Optional: Fronius **Wattpilot** and/or **Ohmpilot** for the "Wattpilot & Ohmpilot" row, see
   [Wattpilot and Ohmpilot](#wattpilot-and-ohmpilot).
 
@@ -183,6 +188,32 @@ counts as PV. Consequences:
 - Selected time ranges longer than about 69 days need `-search.maxPointsSubqueryPerTimeseries=1100000` on
   VictoriaMetrics (already set in the Compose setup), otherwise the panels show an error.
 
+## Balcony power plant
+
+A balcony power plant (plug-in solar) feeds in behind the grid meter. The Fronius smart meter only sees it as
+less grid import, so without extra data the dashboard undercounts production and home usage. Most balcony
+inverters (e.g. TSUN) have no local API, so the plant is measured with a
+**Shelly Gen2+/Gen3 plug** (e.g. Shelly Plug S Gen3) between inverter and socket.
+
+1. Plug the inverter into the Shelly. Feed-in shows up as negative power and in the "returned energy" counter.
+   Check with `http://<shelly>/rpc/Switch.GetStatus?id=0` (`apower` < 0 and `ret_aenergy.total` rising while
+   the sun shines). Keep "reverse" off in the Shelly settings.
+2. Enable the `balcony` job in [victoriametrics/scrape.yml](victoriametrics/scrape.yml) with the IP of the
+   Shelly. json-exporter module: `shelly_balcony` in [json-exporter/config.yml](json-exporter/config.yml).
+
+The dashboard uses `balcony_ret_aenergy_total` (Wh, via `increase()`, so counter resets do no harm) and
+`balcony_apower` (W):
+
+- Production, home usage, local consumption, autonomy, self consumption and savings include the balcony
+  energy. "Local Energy Production" (daily bars) shows Fronius and balcony stacked, the new stat
+  "Balcony Production" shows the balcony share.
+- Live panels: solar power and home usage include the balcony power. The autonomy line in "Energy Usage" is
+  calculated as `1 − grid import / home usage` instead of the inverter's `rel_Autonomy`.
+- Not included: "Total solar energy production" (lifetime counter of the inverter) and the "grouped by kW"
+  panels (inverter power only).
+- Without balcony data every balcony term is 0, the dashboard shows the same values as before. History starts
+  when the Shelly is scraped.
+
 ## Dashboard settings
 
 Dashboard settings → Variables:
@@ -216,17 +247,19 @@ Compose setup) or edit the defaults in `grafana/dashboard.json`.
 - **Daily bars:** VictoriaMetrics aligns daily steps to 00:00 UTC. The queries therefore evaluate the counters
   on an hourly grid, pick the local midnight in `tz` and subtract the counter at the previous local midnight.
   Days with 23 or 25 hours (DST changes) are handled correctly.
+- **Balcony power plant:** `increase()` of the Shelly's returned-energy counter in the same period, added to
+  the inverter production.
 - **Wattpilot/Ohmpilot:** integrated from the power values per minute, see
   [PV/grid split](#pvgrid-split).
 - **Savings:** for every hour, `(production − feed-in) × price_buy + feed-in × price_sell`, summed over the range.
 
-Home usage = production − feed-in + grid draw. Autonomy = self-consumed production / home usage.
+Production = inverter + balcony power plant. Home usage = production − feed-in + grid draw. Autonomy = self-consumed production / home usage.
 
 ## Checking the queries
 
 [scripts/check-queries.py](scripts/check-queries.py) runs every dashboard query against your VictoriaMetrics and
-lists errors and empty results (some are expected, e.g. "Grid down" when the grid never failed, or "Wattpilot" without a running
-wattpilot-exporter):
+lists errors and empty results (some are expected, e.g. "Grid down" when the grid never failed, "Wattpilot" without a running
+wattpilot-exporter or "Balcony" without balcony data):
 
 ```bash
 python3 scripts/check-queries.py http://localhost:8428 --tz Europe/Vienna
@@ -235,8 +268,8 @@ python3 scripts/check-queries.py http://localhost:8428 --tz Europe/Vienna
 ## Known limitations
 
 - Timezones with a non-hour UTC offset (e.g. India, +05:30) shift daily boundaries by up to 30 minutes.
-- Daily battery energy on DST change days is extrapolated from 24 hours of data. Daily Wattpilot/Ohmpilot
-  energy on these days covers 24 hours instead of 23/25.
+- Daily battery energy on DST change days is extrapolated from 24 hours of data. Daily Wattpilot/Ohmpilot and
+  balcony energy on these days covers 24 hours instead of 23/25.
 - The "Energy Production & Cost Summary" dashboard of the original project has not been ported.
 - Panels rely on metric names only. If you scrape several inverters into the same VictoriaMetrics, add label
   filters to the queries.

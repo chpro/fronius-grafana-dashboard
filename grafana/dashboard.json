@@ -425,7 +425,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "max(max_over_time(powerflow_P_Load[$__interval])) * -1",
+          "expr": "(max(max_over_time(powerflow_P_Load[$__interval])) * -1) + (clamp_min(-min(min_over_time(balcony_apower[$__interval])), 0) or vector(0))",
           "legendFormat": "Home Usage",
           "instant": false,
           "range": true,
@@ -439,7 +439,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "max(max_over_time(powerflow_P_PV[$__interval]))",
+          "expr": "max(max_over_time(powerflow_P_PV[$__interval])) + (clamp_min(-min(min_over_time(balcony_apower[$__interval])), 0) or vector(0))",
           "legendFormat": "Solar Energy",
           "instant": false,
           "range": true,
@@ -481,7 +481,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "avg(avg_over_time(powerflow_rel_Autonomy[$__interval]))",
+          "expr": "clamp(100 * (1 - clamp_min(avg(avg_over_time(powerflow_P_Grid[$__interval])), 0) / (-avg(avg_over_time(powerflow_P_Load[$__interval])) + (clamp_min(-avg(avg_over_time(balcony_apower[$__interval])), 0) or vector(0)))), 0, 100)",
           "legendFormat": "Autonomy",
           "instant": false,
           "range": true,
@@ -699,7 +699,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "max(last_over_time(powerflow_P_PV[5m]))",
+          "expr": "max(last_over_time(powerflow_P_PV[5m])) + (clamp_min(-min(last_over_time(balcony_apower[5m])), 0) or vector(0))",
           "legendFormat": "Solar Energy",
           "instant": true,
           "range": false,
@@ -712,7 +712,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "max(last_over_time(powerflow_P_Load[5m]))",
+          "expr": "max(last_over_time(powerflow_P_Load[5m])) - (clamp_min(-min(last_over_time(balcony_apower[5m])), 0) or vector(0))",
           "legendFormat": "Home Usage",
           "instant": true,
           "range": false,
@@ -860,7 +860,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -983,7 +983,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -1659,7 +1659,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))",
           "legendFormat": "Home Usage",
           "instant": true,
           "range": false,
@@ -1742,7 +1742,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -1761,7 +1761,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "comprises power sourced both from the battery and utilized directly",
+      "description": "Fronius inverter + balcony power plant.",
       "fieldConfig": {
         "defaults": {
           "unit": "watth",
@@ -1825,7 +1825,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0)))",
           "legendFormat": "Local Energy Production",
           "instant": true,
           "range": false,
@@ -1834,6 +1834,89 @@
         }
       ],
       "title": "Local Energy Production",
+      "transformations": [],
+      "type": "stat",
+      "transparent": true,
+      "maxDataPoints": 100
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Energy fed in by the balcony power plant (Shelly plug, balcony_ret_aenergy_total).",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "decimals": 1,
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "orange"
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 15,
+        "y": 25
+      },
+      "id": 121,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "valueSize": 30
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0)",
+          "legendFormat": "Balcony",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "title": "Balcony Production",
       "transformations": [],
       "type": "stat",
       "transparent": true,
@@ -2324,7 +2407,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) / ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range]))))",
+          "expr": "(((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) / (((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range]))))",
           "legendFormat": "Autonomy",
           "instant": true,
           "range": false,
@@ -2342,7 +2425,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "",
+      "description": "Lifetime counter of the Fronius inverter (without the balcony power plant).",
       "fieldConfig": {
         "defaults": {
           "unit": "watth",
@@ -3581,7 +3664,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
+          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
           "legendFormat": "solar > home",
           "instant": true,
           "range": false,
@@ -3607,7 +3690,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
+          "expr": "(sum_over_time((((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
           "legendFormat": "Total",
           "instant": true,
           "range": false,
@@ -3729,7 +3812,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
+          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
           "legendFormat": "solar > home",
           "instant": true,
           "range": false,
@@ -3755,7 +3838,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
+          "expr": "(sum_over_time((((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
           "legendFormat": "Total",
           "instant": true,
           "range": false,
@@ -3879,7 +3962,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
+          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
           "legendFormat": "solar > home",
           "instant": true,
           "range": false,
@@ -3905,7 +3988,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
+          "expr": "(sum_over_time((((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
           "legendFormat": "Total",
           "instant": true,
           "range": false,
@@ -4029,7 +4112,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
+          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
           "legendFormat": "solar > home",
           "instant": true,
           "range": false,
@@ -4055,7 +4138,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
+          "expr": "(sum_over_time((((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
           "legendFormat": "Total",
           "instant": true,
           "range": false,
@@ -4180,7 +4263,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
+          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[$__range:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) default 0)) / 1000",
           "legendFormat": "solar > home",
           "instant": true,
           "range": false,
@@ -4206,7 +4289,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
+          "expr": "(sum_over_time((((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[$__range:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset $__range)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset $__range)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset $__range)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset $__range)) * (${price_sell:raw}))) default 0)) / 1000",
           "legendFormat": "Total",
           "instant": true,
           "range": false,
@@ -4331,7 +4414,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[1100d:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset 1100d)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset 1100d)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1100d)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset 1100d))) * (${price_buy:raw})) default 0)) / 1000",
+          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw}))[1100d:1h]) + ((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) default 0) - ((((max(last_over_time(powerflow_E_Total[1d] offset 1100d)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset 1100d)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1100d)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset 1100d))) * (${price_buy:raw})) default 0)) / 1000",
           "legendFormat": "solar > home",
           "instant": true,
           "range": false,
@@ -4357,7 +4440,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(sum_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[1100d:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset 1100d)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset 1100d)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1100d)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset 1100d))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1100d)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset 1100d)) * (${price_sell:raw}))) default 0)) / 1000",
+          "expr": "(sum_over_time((((((max(last_over_time(powerflow_E_Total[1d])) - max(last_over_time(powerflow_E_Total[1d] offset 1h))) + (sum(increase(balcony_ret_aenergy_total[1h])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h)))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1h))) * (${price_sell:raw})))[1100d:1h]) + (((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h])) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h]))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h])) * (${price_sell:raw}))) default 0) - (((((max(last_over_time(powerflow_E_Total[1d] offset 1100d)) - last_over_time((max(last_over_time(powerflow_E_Total[1d])))[1h:1h] offset 1100d)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1100d)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset 1100d))) * (${price_buy:raw})) + ((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d] offset 1100d)) - last_over_time((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])))[1h:1h] offset 1100d)) * (${price_sell:raw}))) default 0)) / 1000",
           "legendFormat": "Total",
           "instant": true,
           "range": false,
@@ -4479,7 +4562,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -4605,7 +4688,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -4731,7 +4814,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -4857,7 +4940,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -4982,7 +5065,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -5108,7 +5191,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -5234,7 +5317,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -5360,7 +5443,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -5486,7 +5569,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -5611,7 +5694,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "(max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
+          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
           "legendFormat": "Local Energy Consumption",
           "instant": true,
           "range": false,
@@ -5658,7 +5741,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "comprises power sourced both from the battery and utilized directly excluding energy feed into grid",
+      "description": "Fronius inverter and balcony power plant per day.",
       "fieldConfig": {
         "defaults": {
           "unit": "watth",
@@ -5704,14 +5787,45 @@
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "none"
+              "mode": "normal"
             },
             "thresholdsStyle": {
               "mode": "off"
             }
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Fronius"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balcony"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -5725,7 +5839,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -5743,7 +5857,21 @@
             "uid": "${datasource}"
           },
           "expr": "last_over_time((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
-          "legendFormat": "Local Energy Production",
+          "legendFormat": "Fronius",
+          "instant": false,
+          "range": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "interval": "1d"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "last_over_time(((sum(increase(balcony_ret_aenergy_total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "legendFormat": "Balcony",
           "instant": false,
           "range": true,
           "editorMode": "code",
@@ -5909,7 +6037,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "last_over_time((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "expr": "last_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (sum(increase(balcony_ret_aenergy_total[1d])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
           "legendFormat": "Home Usage",
           "instant": false,
           "range": true,
@@ -5923,7 +6051,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "last_over_time((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "expr": "last_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (sum(increase(balcony_ret_aenergy_total[1d])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
           "legendFormat": "Local Energy Consumption",
           "instant": false,
           "range": true,
@@ -6444,7 +6572,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "last_over_time((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "expr": "last_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (sum(increase(balcony_ret_aenergy_total[1d])) or vector(0)))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
           "legendFormat": "Local Energy Production",
           "instant": false,
           "range": true,
@@ -6458,7 +6586,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "last_over_time((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "expr": "last_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (sum(increase(balcony_ret_aenergy_total[1d])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
           "legendFormat": "Home Usage",
           "instant": false,
           "range": true,
@@ -6472,7 +6600,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "last_over_time((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "expr": "last_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (sum(increase(balcony_ret_aenergy_total[1d])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
           "legendFormat": "Local Energy Consumption",
           "instant": false,
           "range": true,
@@ -6514,7 +6642,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "last_over_time(((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) / ((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
+          "expr": "last_over_time((((((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (sum(increase(balcony_ret_aenergy_total[1d])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h))) / (((max(last_over_time(powerflow_E_Total[1d])) - last_over_time(((max(last_over_time(powerflow_E_Total[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (sum(increase(balcony_ret_aenergy_total[1d])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)) + (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d])) - last_over_time(((max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[1d]))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[25h:1h] offset 1h)))) and on() (hour(time() + timezone_offset(\"${tz}\")) == 0))[1d:1h] offset -1d)",
           "legendFormat": "Autonomy",
           "instant": false,
           "range": true,

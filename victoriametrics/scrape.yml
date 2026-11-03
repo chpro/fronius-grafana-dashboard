@@ -40,3 +40,20 @@ scrape_configs:
     relabel_configs:
       - target_label: instance
         replacement: wattpilot
+
+  # Balcony power plant measured by a Shelly Gen2+/Gen3 plug (json-exporter module shelly_balcony).
+  # Uncomment and set the IP of the plug.
+  # - job_name: balcony
+  #   scrape_interval: 60s
+  #   metrics_path: /probe
+  #   params:
+  #     module: [shelly_balcony]
+  #   static_configs:
+  #     - targets: ["http://192.168.1.60/rpc/Switch.GetStatus?id=0"]
+  #   relabel_configs:
+  #     - source_labels: [__address__]
+  #       target_label: __param_target
+  #     - target_label: instance
+  #       replacement: balcony
+  #     - target_label: __address__
+  #       replacement: json-exporter:7979
