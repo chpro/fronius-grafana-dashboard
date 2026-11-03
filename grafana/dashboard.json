@@ -7949,7 +7949,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "",
+      "description": "Grid frequency measured by the inverter. Empty while the inverter sleeps (night, battery empty).",
       "fieldConfig": {
         "defaults": {
           "unit": "hertz",
@@ -7994,7 +7994,7 @@
             },
             "showPoints": "never",
             "showValues": false,
-            "spanNulls": true,
+            "spanNulls": 600000,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -8053,7 +8053,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "avg(avg_over_time(inverter_FAC[$__interval]))",
+          "expr": "avg(avg_over_time(inverter_FAC[$__interval])) > 45",
           "legendFormat": "Frequency",
           "instant": false,
           "range": true,
@@ -8117,7 +8117,7 @@
             },
             "showPoints": "never",
             "showValues": false,
-            "spanNulls": true,
+            "spanNulls": 600000,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -8176,7 +8176,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "avg(avg_over_time(inverter_UAC_L1[$__interval]))",
+          "expr": "avg(avg_over_time(inverter_UAC_L1[$__interval])) > 100",
           "legendFormat": "AC L1",
           "instant": false,
           "range": true,
@@ -8190,7 +8190,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "avg(avg_over_time(inverter_UAC_L2[$__interval]))",
+          "expr": "avg(avg_over_time(inverter_UAC_L2[$__interval])) > 100",
           "legendFormat": "AC L2",
           "instant": false,
           "range": true,
@@ -8204,7 +8204,7 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "avg(avg_over_time(inverter_UAC_L3[$__interval]))",
+          "expr": "avg(avg_over_time(inverter_UAC_L3[$__interval])) > 100",
           "legendFormat": "AC L3",
           "instant": false,
           "range": true,
