@@ -836,51 +836,25 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -890,32 +864,20 @@
       },
       "id": 87,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -925,21 +887,8 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))",
-          "legendFormat": "From Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Autonomy",
           "instant": true,
           "range": false,
           "editorMode": "code",
@@ -948,7 +897,7 @@
       ],
       "title": "Autonomy",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true
     },
     {
@@ -959,51 +908,25 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "To Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -1013,32 +936,20 @@
       },
       "id": 107,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -1048,21 +959,8 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "To Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Self consumption",
           "instant": true,
           "range": false,
           "editorMode": "code",
@@ -1071,7 +969,7 @@
       ],
       "title": "Self consumption",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true
     },
     {
@@ -1728,7 +1626,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Local Energy Production",
+      "title": "Production",
       "transformations": [],
       "type": "stat",
       "transparent": true,
@@ -1809,7 +1707,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Balcony Production",
+      "title": "Balcony",
       "transformations": [],
       "type": "stat",
       "transparent": true,
@@ -1890,7 +1788,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Local Energy Consumption",
+      "title": "Self-consumed",
       "transformations": [],
       "type": "stat",
       "transparent": true,
@@ -2542,7 +2440,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Total solar energy production",
+      "title": "Lifetime production",
       "transformations": [],
       "type": "stat",
       "transparent": true,
@@ -2633,8 +2531,8 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 4,
+        "h": 7,
+        "w": 6,
         "x": 0,
         "y": 35
       },
@@ -2710,89 +2608,51 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "Energy for the selected time range, integrated from the power values (1 minute resolution). Grid import at the grid connection point is attributed to Wattpilot and Ohmpilot first (up to their combined power, split between both by power); the rest counts as PV. Energy from the battery counts as PV (stored solar energy). A balcony power plant behind the grid meter is included as PV as well.",
+      "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From PV"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 4,
-        "x": 4,
+        "h": 7,
+        "w": 6,
+        "x": 6,
         "y": 35
       },
       "id": 115,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -2802,30 +2662,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((wp - lg * wp / clamp_min(l, 1))[$__range:1m]) / 60",
-          "legendFormat": "From PV",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((lg * wp / clamp_min(l, 1))[$__range:1m]) / 60",
-          "legendFormat": "From Grid",
+          "expr": "WITH (a = WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((wp - lg * wp / clamp_min(l, 1))[$__range:1m]) / 60, b = WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((lg * wp / clamp_min(l, 1))[$__range:1m]) / 60) 100 * a / (a + b)",
+          "legendFormat": "PV share",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Car charging: PV share",
+      "title": "Car: PV share",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true
     },
     {
@@ -2900,9 +2747,9 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 4,
-        "x": 8,
+        "h": 7,
+        "w": 6,
+        "x": 12,
         "y": 35
       },
       "id": 116,
@@ -2977,89 +2824,51 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "Energy for the selected time range, integrated from the power values (1 minute resolution). Grid import at the grid connection point is attributed to Wattpilot and Ohmpilot first (up to their combined power, split between both by power); the rest counts as PV. Energy from the battery counts as PV (stored solar energy). A balcony power plant behind the grid meter is included as PV as well.",
+      "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From PV"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 4,
-        "x": 12,
+        "h": 7,
+        "w": 6,
+        "x": 18,
         "y": 35
       },
       "id": 117,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -3069,30 +2878,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((op - lg * op / clamp_min(l, 1))[$__range:1m]) / 60",
-          "legendFormat": "From PV",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((lg * op / clamp_min(l, 1))[$__range:1m]) / 60",
-          "legendFormat": "From Grid",
+          "expr": "WITH (a = WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((op - lg * op / clamp_min(l, 1))[$__range:1m]) / 60, b = WITH (g = clamp_min(max(powerflow_P_Grid), 0), wp = (max(wattpilot_power) or vector(0)), op = (max(ohmpilot_PowerReal_PAC_Sum) or vector(0)), l = wp + op, lg = ((l < g) or g)) sum_over_time((lg * op / clamp_min(l, 1))[$__range:1m]) / 60) 100 * a / (a + b)",
+          "legendFormat": "PV share",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Hot water: PV share",
+      "title": "Water: PV share",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true
     },
     {
@@ -3213,10 +3009,10 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 35
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 42
       },
       "id": 118,
       "options": {
@@ -3378,7 +3174,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 43
+        "y": 49
       },
       "id": 119,
       "options": {
@@ -3528,7 +3324,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 43
+        "y": 49
       },
       "id": 120,
       "options": {
@@ -3593,7 +3389,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 51
+        "y": 57
       },
       "panels": []
     },
@@ -3676,7 +3472,7 @@
         "h": 8,
         "w": 4,
         "x": 0,
-        "y": 52
+        "y": 58
       },
       "id": 97,
       "options": {
@@ -3694,7 +3490,7 @@
         },
         "showPercentChange": false,
         "text": {
-          "valueSize": 30
+          "valueSize": 24
         },
         "textMode": "auto",
         "wideLayout": true
@@ -3741,7 +3537,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Savings",
+      "title": "Time range",
       "transformations": [],
       "type": "stat"
     },
@@ -3824,7 +3620,7 @@
         "h": 8,
         "w": 4,
         "x": 4,
-        "y": 52
+        "y": 58
       },
       "id": 98,
       "options": {
@@ -3842,7 +3638,7 @@
         },
         "showPercentChange": false,
         "text": {
-          "valueSize": 30
+          "valueSize": 24
         },
         "textMode": "auto",
         "wideLayout": true
@@ -3889,7 +3685,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Savings this month",
+      "title": "This month",
       "transformations": [],
       "type": "stat",
       "timeShift": "0M/M",
@@ -3974,7 +3770,7 @@
         "h": 8,
         "w": 4,
         "x": 8,
-        "y": 52
+        "y": 58
       },
       "id": 104,
       "options": {
@@ -3992,7 +3788,7 @@
         },
         "showPercentChange": false,
         "text": {
-          "valueSize": 30
+          "valueSize": 24
         },
         "textMode": "auto",
         "wideLayout": true
@@ -4039,7 +3835,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Savings last month",
+      "title": "Last month",
       "transformations": [],
       "type": "stat",
       "timeShift": "1M/M",
@@ -4124,7 +3920,7 @@
         "h": 8,
         "w": 4,
         "x": 12,
-        "y": 52
+        "y": 58
       },
       "id": 99,
       "options": {
@@ -4142,7 +3938,7 @@
         },
         "showPercentChange": false,
         "text": {
-          "valueSize": 30
+          "valueSize": 24
         },
         "textMode": "auto",
         "wideLayout": true
@@ -4189,7 +3985,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Savings this year",
+      "title": "This year",
       "transformations": [],
       "type": "stat",
       "timeFrom": "0y/y",
@@ -4275,7 +4071,7 @@
         "h": 8,
         "w": 4,
         "x": 16,
-        "y": 52
+        "y": 58
       },
       "id": 100,
       "options": {
@@ -4293,7 +4089,7 @@
         },
         "showPercentChange": false,
         "text": {
-          "valueSize": 30
+          "valueSize": 24
         },
         "textMode": "auto",
         "wideLayout": true
@@ -4340,7 +4136,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Savings last year",
+      "title": "Last year",
       "transformations": [],
       "type": "stat",
       "timeFrom": "0y/y",
@@ -4426,7 +4222,7 @@
         "h": 8,
         "w": 4,
         "x": 20,
-        "y": 52
+        "y": 58
       },
       "id": 102,
       "options": {
@@ -4444,7 +4240,7 @@
         },
         "showPercentChange": false,
         "text": {
-          "valueSize": 30
+          "valueSize": 24
         },
         "textMode": "auto",
         "wideLayout": true
@@ -4491,7 +4287,7 @@
           "format": "time_series"
         }
       ],
-      "title": "Total savings",
+      "title": "Total",
       "transformations": [],
       "type": "stat"
     },
@@ -4504,7 +4300,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 60
+        "y": 66
       },
       "panels": []
     },
@@ -4513,89 +4309,51 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "",
+      "description": "Share of the home usage covered by own production (PV, battery, balcony): local energy / (local energy + grid import).",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
         "x": 0,
-        "y": 61
+        "y": 67
       },
-      "id": 82,
+      "id": 122,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -4605,30 +4363,92 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))",
-          "legendFormat": "From Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Autonomy",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Autonomy yesterday",
+      "title": "Today",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
+      "transparent": true,
+      "timeFrom": "0d/d",
+      "timeShift": "0d/d",
+      "hideTimeOverride": true
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 0,
+          "min": 0,
+          "max": 100,
+          "noValue": "–",
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 4,
+        "y": 67
+      },
+      "id": 82,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Autonomy",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "title": "Yesterday",
+      "transformations": [],
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0d/d",
       "timeShift": "1d/d",
@@ -4642,86 +4462,48 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
-        "x": 4,
-        "y": 61
+        "x": 8,
+        "y": 67
       },
       "id": 86,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -4731,30 +4513,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))",
-          "legendFormat": "From Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Autonomy",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Autonomy this month",
+      "title": "This month",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0M/M",
       "timeShift": "0M/M",
@@ -4768,86 +4537,48 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
-        "x": 8,
-        "y": 61
+        "x": 12,
+        "y": 67
       },
       "id": 106,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -4857,30 +4588,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))",
-          "legendFormat": "From Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Autonomy",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Autonomy last month",
+      "title": "Last month",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0M/M",
       "timeShift": "1M/M",
@@ -4894,86 +4612,48 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
-        "x": 12,
-        "y": 61
+        "x": 16,
+        "y": 67
       },
       "id": 88,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -4983,30 +4663,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))",
-          "legendFormat": "From Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Autonomy",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Autonomy this year",
+      "title": "This year",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0y/y",
       "hideTimeOverride": true
@@ -5019,86 +4686,48 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "From Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
-        "x": 16,
-        "y": 61
+        "x": 20,
+        "y": 67
       },
       "id": 92,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -5108,123 +4737,85 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))",
-          "legendFormat": "From Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Plus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Autonomy",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Autonomy last year",
+      "title": "Last year",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0y/y",
       "timeShift": "1y/y",
       "hideTimeOverride": true
     },
     {
+      "type": "row",
+      "id": 124,
+      "title": "Self consumption",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 73
+      },
+      "panels": []
+    },
+    {
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${datasource}"
       },
-      "description": "",
+      "description": "Share of the own production used at home instead of being fed into the grid: local energy / (local energy + grid export).",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "To Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
         "x": 0,
-        "y": 69
+        "y": 74
       },
-      "id": 108,
+      "id": 123,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -5234,30 +4825,92 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "To Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Self consumption",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Self consumption yesterday",
+      "title": "Today",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
+      "transparent": true,
+      "timeFrom": "0d/d",
+      "timeShift": "0d/d",
+      "hideTimeOverride": true
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 0,
+          "min": 0,
+          "max": 100,
+          "noValue": "–",
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 4,
+        "y": 74
+      },
+      "id": 108,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Self consumption",
+          "instant": true,
+          "range": false,
+          "editorMode": "code",
+          "format": "time_series"
+        }
+      ],
+      "title": "Yesterday",
+      "transformations": [],
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0d/d",
       "timeShift": "1d/d",
@@ -5271,86 +4924,48 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "To Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
-        "x": 4,
-        "y": 69
+        "x": 8,
+        "y": 74
       },
       "id": 109,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -5360,30 +4975,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "To Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Self consumption",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Self consumption this month",
+      "title": "This month",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0M/M",
       "timeShift": "0M/M",
@@ -5397,86 +4999,48 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "To Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
-        "x": 8,
-        "y": 69
+        "x": 12,
+        "y": 74
       },
       "id": 110,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -5486,30 +5050,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "To Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Self consumption",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Self consumption last month",
+      "title": "Last month",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0M/M",
       "timeShift": "1M/M",
@@ -5523,86 +5074,48 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "To Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
-        "x": 12,
-        "y": 69
+        "x": 16,
+        "y": 74
       },
       "id": 111,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -5612,30 +5125,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "To Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Self consumption",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Self consumption this year",
+      "title": "This year",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0y/y",
       "hideTimeOverride": true
@@ -5648,86 +5148,48 @@
       "description": "",
       "fieldConfig": {
         "defaults": {
-          "unit": "watth",
+          "unit": "percent",
+          "decimals": 0,
           "min": 0,
+          "max": 100,
+          "noValue": "–",
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-RdYlGr"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Local Energy Consumption"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "super-light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "To Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 4,
-        "x": 16,
-        "y": 69
+        "x": 20,
+        "y": 74
       },
       "id": 112,
       "options": {
-        "displayLabels": [
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": [
-            "percent"
-          ]
-        },
-        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "sort": "desc",
-        "tooltip": {
-          "hideZeros": false,
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": false,
+        "sizing": "auto",
+        "minVizWidth": 75,
+        "minVizHeight": 75,
+        "text": {}
       },
       "pluginVersion": "12.2.1",
       "targets": [
@@ -5737,30 +5199,17 @@
             "type": "victoriametrics-metrics-datasource",
             "uid": "${datasource}"
           },
-          "expr": "((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "Local Energy Consumption",
-          "instant": true,
-          "range": false,
-          "editorMode": "code",
-          "format": "time_series"
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${datasource}"
-          },
-          "expr": "(max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))",
-          "legendFormat": "To Grid",
+          "expr": "WITH (a = ((max(last_over_time(powerflow_E_Total[$__range])) - min(first_over_time(powerflow_E_Total[$__range]))) + (sum(increase(balcony_ret_aenergy_total[$__range])) or vector(0))) - (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range]))), b = (max(last_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])) - min(first_over_time(smartmeter_EnergyReal_WAC_Minus_Absolute[$__range])))) 100 * a / (a + b)",
+          "legendFormat": "Self consumption",
           "instant": true,
           "range": false,
           "editorMode": "code",
           "format": "time_series"
         }
       ],
-      "title": "Self consumption last year",
+      "title": "Last year",
       "transformations": [],
-      "type": "piechart",
+      "type": "gauge",
       "transparent": true,
       "timeFrom": "0y/y",
       "timeShift": "1y/y",
@@ -5775,7 +5224,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 77
+        "y": 80
       },
       "panels": []
     },
@@ -5874,7 +5323,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 78
+        "y": 81
       },
       "id": 25,
       "options": {
@@ -6055,7 +5504,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 78
+        "y": 81
       },
       "id": 24,
       "options": {
@@ -6218,7 +5667,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 86
+        "y": 89
       },
       "id": 26,
       "options": {
@@ -6369,7 +5818,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 86
+        "y": 89
       },
       "id": 27,
       "options": {
@@ -6592,7 +6041,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 94
+        "y": 97
       },
       "id": 74,
       "options": {
@@ -6752,7 +6201,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 100
+        "y": 103
       },
       "id": 81,
       "options": {
@@ -6982,7 +6431,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 100
+        "y": 103
       },
       "id": 103,
       "options": {
@@ -7168,7 +6617,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 113
+        "y": 116
       },
       "panels": []
     },
@@ -7238,7 +6687,7 @@
         "h": 5,
         "w": 8,
         "x": 0,
-        "y": 114
+        "y": 117
       },
       "id": 32,
       "options": {
@@ -7373,7 +6822,7 @@
         "h": 5,
         "w": 8,
         "x": 8,
-        "y": 114
+        "y": 117
       },
       "id": 62,
       "options": {
@@ -7524,7 +6973,7 @@
         "h": 5,
         "w": 8,
         "x": 16,
-        "y": 114
+        "y": 117
       },
       "id": 63,
       "options": {
@@ -7759,7 +7208,7 @@
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 119
+        "y": 122
       },
       "id": 34,
       "options": {
@@ -7881,7 +7330,7 @@
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 119
+        "y": 122
       },
       "id": 35,
       "options": {
@@ -8004,7 +7453,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 125
+        "y": 128
       },
       "id": 38,
       "options": {
@@ -8127,7 +7576,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 130
+        "y": 133
       },
       "id": 61,
       "options": {
@@ -8320,7 +7769,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 135
+        "y": 138
       },
       "id": 77,
       "options": {
@@ -8610,7 +8059,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 140
+        "y": 143
       },
       "id": 55,
       "options": {

@@ -28,6 +28,8 @@ Fronius systems. No support or warranty is provided. Use at your own risk.
   and savings (see [Balcony power plant](#balcony-power-plant)).
 - **Wattpilot & Ohmpilot:** energy into the car and into hot water, split into PV and grid
   (see [Wattpilot and Ohmpilot](#wattpilot-and-ohmpilot)).
+- **Readable on tablets and phones:** autonomy and self consumption as percent gauges (today, yesterday,
+  this/last month, this/last year), short panel titles and tiles wide enough for portrait mode.
 - **Docker Compose and Kubernetes** deployment included.
 
 ## Architecture
@@ -205,12 +207,12 @@ The dashboard uses `balcony_ret_aenergy_total` (Wh, via `increase()`, so counter
 `balcony_apower` (W):
 
 - Production, home usage, local consumption, autonomy, self consumption and savings include the balcony
-  energy. "Local Energy Production" (daily bars) shows Fronius and balcony stacked, the new stat
-  "Balcony Production" shows the balcony share.
+  energy. "Local Energy Production" (daily bars) shows Fronius and balcony stacked, the stat
+  "Balcony" in "Energy Meters" shows the balcony share.
 - Live panels: solar power and home usage include the balcony power. The balcony power is also shown on its
   own (orange line "Balcony" in "Energy Usage", gauge "Balcony" in "Power flow"). The autonomy line in "Energy Usage" is
   calculated as `1 − grid import / home usage` instead of the inverter's `rel_Autonomy`.
-- Not included: "Total solar energy production" (lifetime counter of the inverter) and the "grouped by kW"
+- Not included: "Lifetime production" (lifetime counter of the inverter) and the "grouped by kW"
   panels (inverter power only).
 - Without balcony data every balcony term is 0, the dashboard shows the same values as before. History starts
   when the Shelly is scraped.
