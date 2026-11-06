@@ -16,10 +16,10 @@ Usage:
   python3 scripts/tsun-import.py --device <deviceGuid> --since 2023-04-30 --until 2026-11-03T12:10:00Z
   curl -X POST --data-binary @tsun-import.jsonl http://localhost:8428/api/v1/import
 
-Downloaded weeks are kept in --cache, a second run only fetches what is missing. Timestamps in the export
+Downloaded blocks are kept in --cache, a second run only fetches what is missing. Timestamps in the export
 are local wall time of the plant (--tz), regardless of the timezone parameter of the request.
 """
-import argparse, datetime as dt, io, json, os, re, sys, time, urllib.parse, urllib.request, zipfile
+import argparse, datetime as dt, io, json, os, re, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
 from zoneinfo import ZoneInfo
 
 ap = argparse.ArgumentParser()
@@ -29,6 +29,7 @@ ap.add_argument("--until", required=True, help="end (exclusive), ISO time with z
 ap.add_argument("--tz", default="Europe/Berlin")
 ap.add_argument("--cache", default="tsun-cache")
 ap.add_argument("--out", default="tsun-import.jsonl")
+ap.add_argument("--days", type=int, default=7, help="days per request, smaller if the portal times out")
 ap.add_argument("--max-gap", type=int, default=900, help="seconds; longer gaps between samples add no energy")
 a = ap.parse_args()
 
@@ -48,7 +49,15 @@ def download(first, last):
     q = urllib.parse.urlencode({"deviceGuid": a.device, "group": "hour", "date": f"{first}~{last}",
                                 "series": "phaseA_active_power", "timezone": "+00:00"})
     req = urllib.request.Request(f"{API}?{q}", headers={"Authorization": token, "User-Agent": "Mozilla/5.0"})
-    body = urllib.request.urlopen(req, timeout=120).read()
+    for attempt in range(4):  # the portal answers 502/504 now and then, especially for older data
+        try:
+            body = urllib.request.urlopen(req, timeout=180).read()
+            break
+        except urllib.error.HTTPError as ex:
+            if ex.code < 500 or attempt == 3:
+                sys.exit(f"{first}~{last}: HTTP {ex.code}: {ex.read()[:300].decode(errors='replace')}")
+            print(f"{first}~{last}: HTTP {ex.code}, retrying in {30 * (attempt + 1)}s", file=sys.stderr)
+            time.sleep(30 * (attempt + 1))
     if not body.startswith(b"PK"):  # no xlsx: the portal answers errors (e.g. expired token) as JSON
         sys.exit(f"{first}~{last}: unexpected answer: {body[:300].decode(errors='replace')}")
     open(path, "wb").write(body)
@@ -78,7 +87,7 @@ def rows(xlsx):
 samples = {}
 day = dt.date.fromisoformat(a.since)
 while day < until.astimezone(tz).date() + dt.timedelta(days=1):
-    last = day + dt.timedelta(days=6)
+    last = day + dt.timedelta(days=a.days - 1)
     n = 0
     for ts, p in rows(download(day, last)):
         t = dt.datetime.strptime(ts[:16], "%Y-%m-%d %H:%M").replace(tzinfo=tz)
