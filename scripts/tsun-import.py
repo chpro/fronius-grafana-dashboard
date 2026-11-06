@@ -39,6 +39,18 @@ until = dt.datetime.fromisoformat(a.until.replace("Z", "+00:00"))
 os.makedirs(a.cache, exist_ok=True)
 
 
+def get(url, token, what):
+    req = urllib.request.Request(url, headers={"Authorization": token, "User-Agent": "Mozilla/5.0"})
+    for attempt in range(4):  # the portal answers 502/504 now and then, especially for older data
+        try:
+            return urllib.request.urlopen(req, timeout=180).read()
+        except urllib.error.HTTPError as ex:
+            if ex.code < 500 or attempt == 3:
+                sys.exit(f"{what}: HTTP {ex.code}: {ex.read()[:300].decode(errors='replace')}")
+            print(f"{what}: HTTP {ex.code}, retrying in {30 * (attempt + 1)}s", file=sys.stderr)
+            time.sleep(30 * (attempt + 1))
+
+
 def download(first, last):
     path = os.path.join(a.cache, f"{first}_{last}.xlsx")
     if os.path.exists(path):
@@ -46,20 +58,23 @@ def download(first, last):
     token = os.environ.get("TSUN_TOKEN") or sys.exit("TSUN_TOKEN is not set")
     if not token.lower().startswith("bearer "):
         token = "Bearer " + token
-    q = urllib.parse.urlencode({"deviceGuid": a.device, "group": "hour", "date": f"{first}~{last}",
+    what = f"{first}~{last}"
+    q = urllib.parse.urlencode({"deviceGuid": a.device, "group": "hour", "date": what,
                                 "series": "phaseA_active_power", "timezone": "+00:00"})
-    req = urllib.request.Request(f"{API}?{q}", headers={"Authorization": token, "User-Agent": "Mozilla/5.0"})
-    for attempt in range(4):  # the portal answers 502/504 now and then, especially for older data
+    body = get(f"{API}?{q}", token, what)
+    if not body.startswith(b"PK"):
+        # the portal writes the xlsx to a file and answers with its path:
+        # {"code":200,"data":"/profile/upload/chart-report/…/chart-….xlsx"}; errors are JSON as well
         try:
-            body = urllib.request.urlopen(req, timeout=180).read()
-            break
-        except urllib.error.HTTPError as ex:
-            if ex.code < 500 or attempt == 3:
-                sys.exit(f"{first}~{last}: HTTP {ex.code}: {ex.read()[:300].decode(errors='replace')}")
-            print(f"{first}~{last}: HTTP {ex.code}, retrying in {30 * (attempt + 1)}s", file=sys.stderr)
-            time.sleep(30 * (attempt + 1))
-    if not body.startswith(b"PK"):  # no xlsx: the portal answers errors (e.g. expired token) as JSON
-        sys.exit(f"{first}~{last}: unexpected answer: {body[:300].decode(errors='replace')}")
+            answer = json.loads(body)
+        except ValueError:
+            answer = {}
+        file = answer.get("data") if answer.get("code") == 200 else None
+        if not isinstance(file, str) or not file.endswith(".xlsx"):
+            sys.exit(f"{what}: unexpected answer: {body[:300].decode(errors='replace')}")
+        body = get(API.split("/df/")[0] + file, token, what)
+        if not body.startswith(b"PK"):
+            sys.exit(f"{what}: {file} is no xlsx: {body[:300].decode(errors='replace')}")
     open(path, "wb").write(body)
     time.sleep(1)
     return body
