@@ -217,6 +217,29 @@ The dashboard uses `balcony_ret_aenergy_total` (Wh, via `increase()`, so counter
 - Without balcony data every balcony term is 0, the dashboard shows the same values as before. History starts
   when the Shelly is scraped.
 
+### History from the TSUN cloud
+
+TSUN micro inverters report to talent-monitoring.com. Its chart export has 5 minute values, which
+[scripts/tsun-import.py](scripts/tsun-import.py) turns into `balcony_apower{source="tsun"}` and
+`balcony_ret_aenergy_total{source="tsun"}` for the time before the Shelly plug. The dashboard sums all balcony
+series, so production, autonomy and savings include the imported history without further changes.
+
+1. Log in to talent-monitoring.com, open the device chart and export it. In the browser dev tools (Network) the
+   request `exportChartData?deviceGuid=…` shows the `deviceGuid` and the `Authorization` header.
+2. Download and convert (the token is read without echo; weeks are cached in `tsun-cache/`):
+
+   ```sh
+   read -rs TSUN_TOKEN && export TSUN_TOKEN
+   python3 scripts/tsun-import.py --device <deviceGuid> --since <first day> --until <first Shelly sample, e.g. 2026-11-03T12:10:00Z>
+   ```
+
+   `--until` must be the time the Shelly data starts, otherwise energy is counted twice.
+3. Import: `curl -X POST --data-binary @tsun-import.jsonl http://localhost:8428/api/v1/import`.
+   To undo: `curl 'http://localhost:8428/api/v1/admin/tsdb/delete_series?match[]={source="tsun"}'`.
+
+The portal API is unofficial and may change. The timestamps of the export are local time of the plant (`--tz`,
+default `Europe/Berlin`). Compared with a Shelly plug the TSUN values are about 1–3 % higher.
+
 ## Dashboard settings
 
 Dashboard settings → Variables:

@@ -1,3 +1,5 @@
 docker-compose/.env
 docker-compose/compose.override.yaml
 docker-compose/local/
+tsun-cache/
+tsun-import.jsonl
