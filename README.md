@@ -237,8 +237,9 @@ series, so production, autonomy and savings include the imported history without
 3. Import: `curl -X POST --data-binary @tsun-import.jsonl http://localhost:8428/api/v1/import`.
    To undo: `curl 'http://localhost:8428/api/v1/admin/tsdb/delete_series?match[]={source="tsun"}'`.
 
-The portal API is unofficial and may change. The timestamps of the export are local time of the plant (`--tz`,
-default `Europe/Berlin`). Compared with a Shelly plug the TSUN values are about 1–3 % higher.
+The portal API is unofficial and may change. The script requests UTC, days and timestamps (`--since`, file
+names in `tsun-cache/`) are UTC. If the portal times out (HTTP 504), use `--days 1`. Compared with a Shelly plug
+the TSUN values are about 1–3 % higher.
 
 ## Dashboard settings
 

@@ -16,17 +16,15 @@ Usage:
   python3 scripts/tsun-import.py --device <deviceGuid> --since 2023-04-30 --until 2026-11-03T12:10:00Z
   curl -X POST --data-binary @tsun-import.jsonl http://localhost:8428/api/v1/import
 
-Downloaded blocks are kept in --cache, a second run only fetches what is missing. Timestamps in the export
-are local wall time of the plant (--tz), regardless of the timezone parameter of the request.
+Downloaded blocks are kept in --cache, a second run only fetches what is missing. The script requests UTC
+(timezone=+00:00): days and timestamps of the export are then UTC, so daylight saving time does not matter.
 """
 import argparse, datetime as dt, io, json, os, re, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
-from zoneinfo import ZoneInfo
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--device", required=True, help="deviceGuid from the exportChartData URL")
 ap.add_argument("--since", required=True, help="first day, YYYY-MM-DD")
 ap.add_argument("--until", required=True, help="end (exclusive), ISO time with zone, e.g. 2026-11-03T12:10:00Z")
-ap.add_argument("--tz", default="Europe/Berlin")
 ap.add_argument("--cache", default="tsun-cache")
 ap.add_argument("--out", default="tsun-import.jsonl")
 ap.add_argument("--days", type=int, default=7, help="days per request, smaller if the portal times out")
@@ -34,9 +32,13 @@ ap.add_argument("--max-gap", type=int, default=900, help="seconds; longer gaps b
 a = ap.parse_args()
 
 API = "https://www.talent-monitoring.com/prod-api/df/exportChartData"
-tz = ZoneInfo(a.tz)
+tz = dt.timezone.utc  # the export uses the timezone of the request
 until = dt.datetime.fromisoformat(a.until.replace("Z", "+00:00"))
 os.makedirs(a.cache, exist_ok=True)
+
+
+class PortalError(Exception):
+    pass
 
 
 def get(url, token, what):
@@ -45,16 +47,32 @@ def get(url, token, what):
         try:
             return urllib.request.urlopen(req, timeout=180).read()
         except urllib.error.HTTPError as ex:
-            if ex.code < 500 or attempt == 3:
+            if ex.code < 500:
                 sys.exit(f"{what}: HTTP {ex.code}: {ex.read()[:300].decode(errors='replace')}")
+            if attempt == 3:
+                raise PortalError(f"{what}: HTTP {ex.code}")
             print(f"{what}: HTTP {ex.code}, retrying in {30 * (attempt + 1)}s", file=sys.stderr)
             time.sleep(30 * (attempt + 1))
 
 
 def download(first, last):
+    """xlsx files of the block; a block that keeps failing is fetched day by day."""
     path = os.path.join(a.cache, f"{first}_{last}.xlsx")
     if os.path.exists(path):
-        return open(path, "rb").read()
+        return [open(path, "rb").read()]
+    days = [first + dt.timedelta(days=i) for i in range((last - first).days + 1)]
+    if len(days) > 1 and all(os.path.exists(os.path.join(a.cache, f"{d}_{d}.xlsx")) for d in days):
+        return [b for d in days for b in download(d, d)]
+    try:
+        return [fetch(first, last, path)]
+    except PortalError as ex:
+        if len(days) == 1:
+            sys.exit(f"{ex}, giving up; run again later or with another --days")
+        print(f"{ex}, fetching day by day", file=sys.stderr)
+        return [b for d in days for b in download(d, d)]
+
+
+def fetch(first, last, path):
     token = os.environ.get("TSUN_TOKEN") or sys.exit("TSUN_TOKEN is not set")
     if not token.lower().startswith("bearer "):
         token = "Bearer " + token
@@ -101,10 +119,10 @@ def rows(xlsx):
 
 samples = {}
 day = dt.date.fromisoformat(a.since)
-while day < until.astimezone(tz).date() + dt.timedelta(days=1):
+while dt.datetime.combine(day, dt.time(), tz) < until:
     last = day + dt.timedelta(days=a.days - 1)
     n = 0
-    for ts, p in rows(download(day, last)):
+    for ts, p in (r for x in download(day, last) for r in rows(x)):
         t = dt.datetime.strptime(ts[:16], "%Y-%m-%d %H:%M").replace(tzinfo=tz)
         if t < until:
             samples[int(t.timestamp())] = p
