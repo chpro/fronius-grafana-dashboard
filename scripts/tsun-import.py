@@ -93,7 +93,8 @@ def fetch(first, last, path):
         body = get(API.split("/df/")[0] + file, token, what)
         if not body.startswith(b"PK"):
             sys.exit(f"{what}: {file} is no xlsx: {body[:300].decode(errors='replace')}")
-    open(path, "wb").write(body)
+    if next(rows(body), None):  # empty answers are not cached, the portal may still be catching up
+        open(path, "wb").write(body)
     time.sleep(1)
     return body
 
