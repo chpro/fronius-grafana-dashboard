@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 """Converts the history of a TSUN micro inverter (talent-monitoring.com) into VictoriaMetrics import data.
 
-The TSUN portal has no official API. Its chart export (`exportChartData`) returns an xlsx file with the
-5 minute values of a device; this script downloads it week by week, integrates the AC output power to an
-energy counter and writes a file for VictoriaMetrics' /api/v1/import:
+The TSUN portal has no official API. This script uses what its web page uses:
+
+- the chart export (`exportChartData`, xlsx) with the 5 minute AC power, downloaded week by week. The portal
+  keeps these only for a limited time (here from late September 2023 on).
+- the daily yield of every day (`selectChartData`, group=day, one request per month), available since the
+  start of the plant.
+
+Days with 5 minute values keep their power curve; the counter is scaled up to the daily yield where samples are
+missing. Days with only a daily yield get it spread over the hours of a typical solar day. The result is written
+for VictoriaMetrics' /api/v1/import:
 
   balcony_apower{source="tsun"}             AC output in W, negative like a Shelly plug sees feed-in
   balcony_ret_aenergy_total{source="tsun"}  energy fed in since --since in Wh
@@ -16,14 +23,16 @@ Usage:
   python3 scripts/tsun-import.py --device <deviceGuid> --since 2023-04-30 --until 2026-11-03T12:10:00Z
   curl -X POST --data-binary @tsun-import.jsonl http://localhost:8428/api/v1/import
 
-Downloaded blocks are kept in --cache, a second run only fetches what is missing. The script requests UTC
-(timezone=+00:00): days and timestamps of the export are then UTC, so daylight saving time does not matter.
+Downloaded blocks are kept in --cache, a second run only fetches what is missing. The export is requested
+in UTC (timezone=+00:00), its timestamps are UTC then. Daily yields are per local calendar day (--tz).
 """
-import argparse, datetime as dt, io, json, os, re, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
+import argparse, datetime as dt, io, json, math, os, re, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
+from zoneinfo import ZoneInfo
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--device", required=True, help="deviceGuid from the exportChartData URL")
 ap.add_argument("--since", required=True, help="first day, YYYY-MM-DD")
+ap.add_argument("--tz", default="Europe/Berlin", help="timezone of the plant, for the daily yields")
 ap.add_argument("--until", required=True, help="end (exclusive), ISO time with zone, e.g. 2026-11-03T12:10:00Z")
 ap.add_argument("--cache", default="tsun-cache")
 ap.add_argument("--out", default="tsun-import.jsonl")
@@ -31,8 +40,10 @@ ap.add_argument("--days", type=int, default=7, help="days per request, smaller i
 ap.add_argument("--max-gap", type=int, default=900, help="seconds; longer gaps between samples add no energy")
 a = ap.parse_args()
 
-API = "https://www.talent-monitoring.com/prod-api/df/exportChartData"
+BASE = "https://www.talent-monitoring.com/prod-api"
+API = BASE + "/df/exportChartData"
 tz = dt.timezone.utc  # the export uses the timezone of the request
+local = ZoneInfo(a.tz)
 until = dt.datetime.fromisoformat(a.until.replace("Z", "+00:00"))
 os.makedirs(a.cache, exist_ok=True)
 
@@ -55,6 +66,35 @@ def get(url, token, what):
             time.sleep(30 * (attempt + 1))
 
 
+def token():
+    t = os.environ.get("TSUN_TOKEN") or sys.exit("TSUN_TOKEN is not set")
+    return t if t.lower().startswith("bearer ") else "Bearer " + t
+
+
+def daily(month):
+    """{local date: Wh} of one month."""
+    path = os.path.join(a.cache, f"daily-{month:%Y-%m}.json")
+    if os.path.exists(path):
+        body = open(path, "rb").read()
+    else:
+        offset = dt.datetime.combine(month.replace(day=15), dt.time(12), local).strftime("%z")
+        q = urllib.parse.urlencode({"deviceGuid": a.device, "group": "day", "date": f"{month}",
+                                    "series": "energy_today", "timezone": offset[:3] + ":" + offset[3:]})
+        body = get(f"{BASE}/df/selectChartData?{q}", token(), f"daily {month:%Y-%m}")
+        try:
+            answer = json.loads(body)
+        except ValueError:
+            answer = {}
+        if answer.get("code") != 200 or not isinstance(answer.get("data"), dict):
+            sys.exit(f"daily {month:%Y-%m}: unexpected answer: {body[:300].decode(errors='replace')}")
+        if answer["data"].get("chart"):
+            open(path, "wb").write(body)
+        time.sleep(1)
+    chart = json.loads(body)["data"].get("chart") or []
+    return {dt.date(c["year"], c["month"], c["day"]): float(c["energyToday"]) for c in chart
+            if c.get("energyToday") is not None}
+
+
 def download(first, last):
     """xlsx files of the block; a block that keeps failing is fetched day by day."""
     path = os.path.join(a.cache, f"{first}_{last}.xlsx")
@@ -73,13 +113,10 @@ def download(first, last):
 
 
 def fetch(first, last, path):
-    token = os.environ.get("TSUN_TOKEN") or sys.exit("TSUN_TOKEN is not set")
-    if not token.lower().startswith("bearer "):
-        token = "Bearer " + token
     what = f"{first}~{last}"
     q = urllib.parse.urlencode({"deviceGuid": a.device, "group": "hour", "date": what,
                                 "series": "phaseA_active_power", "timezone": "+00:00"})
-    body = get(f"{API}?{q}", token, what)
+    body = get(f"{API}?{q}", token(), what)
     if not body.startswith(b"PK"):
         # the portal writes the xlsx to a file and answers with its path:
         # {"code":200,"data":"/profile/upload/chart-report/…/chart-….xlsx"}; errors are JSON as well
@@ -90,7 +127,7 @@ def fetch(first, last, path):
         file = answer.get("data") if answer.get("code") == 200 else None
         if not isinstance(file, str) or not file.endswith(".xlsx"):
             sys.exit(f"{what}: unexpected answer: {body[:300].decode(errors='replace')}")
-        body = get(API.split("/df/")[0] + file, token, what)
+        body = get(BASE + file, token(), what)
         if not body.startswith(b"PK"):
             sys.exit(f"{what}: {file} is no xlsx: {body[:300].decode(errors='replace')}")
     if next(rows(body), None):  # empty answers are not cached, the portal may still be catching up
@@ -131,21 +168,60 @@ while dt.datetime.combine(day, dt.time(), tz) < until:
     print(f"{day} – {last}: {n} samples", file=sys.stderr)
     day = last + dt.timedelta(days=1)
 
+yields = {}
+month = dt.date.fromisoformat(a.since).replace(day=1)
+while dt.datetime.combine(month, dt.time(), local) < until:
+    y = daily(month)
+    yields.update(y)
+    print(f"{month:%Y-%m}: {len(y)} daily yields, {sum(y.values()) / 1000:.1f} kWh", file=sys.stderr)
+    month = (month + dt.timedelta(days=32)).replace(day=1)
+
 ts = sorted(samples)
-if not ts:
+if not ts and not yields:
     sys.exit("no data")
-# counter: one value per sample, plus every 30 minutes during gaps (nights), so increase() always finds a
-# recent sample before its window
-energy, counter, gaps = 0.0, [], 0
-for i, t in enumerate(ts):
-    if i:
-        prev = ts[i - 1]
-        if t - prev <= a.max_gap:
-            energy += (samples[prev] + samples[t]) / 2 * (t - prev) / 3600
-        else:
-            gaps += 1
-            counter += [(f, round(energy, 2)) for f in range(prev + 1800, t, 1800)]
+by_day = {}
+for t in ts:
+    by_day.setdefault(dt.datetime.fromtimestamp(t, local).date(), []).append(t)
+
+# energy increments (time, Wh) per local day
+steps = []
+n_fine = n_scaled = n_daily = 0
+wh_fine = wh_scaled = wh_daily = 0.0  # 5 minute values, the same days after scaling, daily yield only
+day, last_day = dt.date.fromisoformat(a.since), until.astimezone(local).date()
+while day <= last_day:
+    times = by_day.get(day, [])
+    inc = [(t, (samples[p] + samples[t]) / 2 * (t - p) / 3600 if t - p <= a.max_gap else 0.0)
+           for p, t in zip(times, times[1:])]
+    fine = sum(e for _, e in inc)
+    total = yields.get(day) if day != last_day else None  # the day of --until is only partly before it
+    if fine > 0:
+        factor = max(1.0, total / fine) if total else 1.0
+        steps += [(t, e * factor) for t, e in inc]
+        n_fine += 1
+        n_scaled += factor > 1.02
+        wh_fine += fine
+        wh_scaled += fine * factor
+    elif total:
+        # no 5 minute values: a half sine between 6:00 and 20:00 local time, one step per hour
+        hours = [(h, math.sin(math.pi * (h - 6) / 14)) for h in range(7, 21)]
+        weight = sum(w for _, w in hours)
+        steps += [(int(dt.datetime.combine(day, dt.time(h), local).timestamp()), total * w / weight) for h, w in hours]
+        n_daily += 1
+        wh_daily += total
+    day += dt.timedelta(days=1)
+
+# counter: one value per step, plus every 30 minutes in between (nights, days without data), so increase()
+# always finds a recent sample before its window
+start = int(dt.datetime.combine(dt.date.fromisoformat(a.since), dt.time(), local).timestamp())
+end = int(until.timestamp()) - 1
+energy, counter, prev = 0.0, [(start, 0.0)], start
+for t, e in sorted(steps) + [(end, 0.0)]:
+    counter += [(f, round(energy, 2)) for f in range(prev + 1800, t, 1800)]
+    energy += e
+    if t == counter[-1][0]:
+        counter.pop()
     counter.append((t, round(energy, 2)))
+    prev = t
 
 with open(a.out, "w") as f:
     for name, series in (("balcony_apower", [(t, -samples[t]) for t in ts]), ("balcony_ret_aenergy_total", counter)):
@@ -153,6 +229,6 @@ with open(a.out, "w") as f:
             chunk = series[i:i + 10000]
             f.write(json.dumps({"metric": {"__name__": name, "source": "tsun"}, "values": [v for _, v in chunk],
                                 "timestamps": [t * 1000 for t, _ in chunk]}) + "\n")
-fmt = lambda t: dt.datetime.fromtimestamp(t, tz).strftime("%Y-%m-%d %H:%M")
-print(f"{len(ts)} samples {fmt(ts[0])} – {fmt(ts[-1])}, {energy / 1000:.1f} kWh, {gaps} gaps > {a.max_gap}s"
-      f" -> {a.out}", file=sys.stderr)
+print(f"{n_fine} days with 5 minute values: {wh_fine / 1000:.1f} kWh, {n_scaled} days scaled up to the daily "
+      f"yield -> {wh_scaled / 1000:.1f} kWh; {n_daily} days with the daily yield only: {wh_daily / 1000:.1f} kWh; "
+      f"total {energy / 1000:.1f} kWh -> {a.out}", file=sys.stderr)

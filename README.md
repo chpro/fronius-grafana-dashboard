@@ -219,14 +219,22 @@ The dashboard uses `balcony_ret_aenergy_total` (Wh, via `increase()`, so counter
 
 ### History from the TSUN cloud
 
-TSUN micro inverters report to talent-monitoring.com. Its chart export has 5 minute values, which
-[scripts/tsun-import.py](scripts/tsun-import.py) turns into `balcony_apower{source="tsun"}` and
-`balcony_ret_aenergy_total{source="tsun"}` for the time before the Shelly plug. The dashboard sums all balcony
-series, so production, autonomy and savings include the imported history without further changes.
+TSUN micro inverters report to talent-monitoring.com. [scripts/tsun-import.py](scripts/tsun-import.py) turns
+its history into `balcony_apower{source="tsun"}` and `balcony_ret_aenergy_total{source="tsun"}` for the time
+before the Shelly plug. The dashboard sums all balcony series, so production, autonomy and savings include the
+imported history without further changes. The script uses two requests of the portal's web page:
 
-1. Log in to talent-monitoring.com, open the device chart and export it. In the browser dev tools (Network) the
-   request `exportChartData?deviceGuid=…` shows the `deviceGuid` and the `Authorization` header.
-2. Download and convert (the token is read without echo; weeks are cached in `tsun-cache/`):
+- `exportChartData`: 5 minute AC power, downloaded week by week. The portal keeps these only for a limited
+  time (in one case from September 2023 on, for a plant online since April 2023).
+- `selectChartData` with `group=day`: the daily yield, one request per month, available since the start.
+
+Days with 5 minute values keep their power curve; if samples are missing, the counter is scaled up to the daily
+yield. Days with only a daily yield get it spread over the hours of a typical solar day (no power curve).
+
+1. Log in to talent-monitoring.com and open the device. In the browser dev tools (Network, filter `ChartData`)
+   a request shows the `deviceGuid` and the `Authorization` header.
+2. Download and convert (the token is read without echo; downloads are cached in `tsun-cache/`, a second run
+   only fetches what is missing, e.g. after the token expired):
 
    ```sh
    read -rs TSUN_TOKEN && export TSUN_TOKEN
@@ -237,9 +245,9 @@ series, so production, autonomy and savings include the imported history without
 3. Import: `curl -X POST --data-binary @tsun-import.jsonl http://localhost:8428/api/v1/import`.
    To undo: `curl 'http://localhost:8428/api/v1/admin/tsdb/delete_series?match[]={source="tsun"}'`.
 
-The portal API is unofficial and may change. The script requests UTC, days and timestamps (`--since`, file
-names in `tsun-cache/`) are UTC. If the portal times out (HTTP 504), use `--days 1`. Compared with a Shelly plug
-the TSUN values are about 1–3 % higher.
+The portal API is unofficial and may change. The export is requested in UTC, the daily yields are local days
+(`--tz`, default `Europe/Berlin`). If the portal times out (HTTP 504), the script retries and falls back to
+single days. Compared with a Shelly plug the TSUN values are about 1–3 % higher.
 
 ## Dashboard settings
 
