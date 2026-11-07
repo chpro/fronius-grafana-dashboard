@@ -8,8 +8,9 @@ The TSUN portal has no official API. This script uses what its web page uses:
 - the daily yield of every day (`selectChartData`, group=day, one request per month), available since the
   start of the plant.
 
-Days with 5 minute values keep their power curve; the counter is scaled up to the daily yield where samples are
-missing. Days with only a daily yield get it spread over the hours of a typical solar day. The result is written
+Days with 5 minute values keep their power curve; the counter is scaled up by the few percent the daily yield is
+higher, and if more is missing, the rest of the daily yield goes to the hours without values, spread like a typical
+solar day. Days with only a daily yield get it spread over the whole day that way. The result is written
 for VictoriaMetrics' /api/v1/import:
 
   balcony_apower{source="tsun"}             AC output in W, negative like a Shelly plug sees feed-in
@@ -198,9 +199,22 @@ for t in ts:
     by_day.setdefault(dt.datetime.fromtimestamp(t, local).date(), []).append(t)
 
 # energy increments (time, Wh) per local day
+SLOT = 900  # a typical solar day: a half sine between 6:00 and 20:00 in 15 minute slots
+SUN = [(6 * 3600 + i * SLOT, math.sin(math.pi * (i + 0.5) / 56)) for i in range(56)]
+
+
+def sun(day, wh, covered=()):
+    """wh spread like a typical solar day over the slots not in covered, one step at the end of each slot"""
+    midnight = int(dt.datetime.combine(day, dt.time(), local).timestamp())
+    free = [(midnight + s, w) for s, w in SUN if not any(p < midnight + s + SLOT and t > midnight + s
+                                                          for p, t in covered)]
+    weight = sum(w for _, w in free)
+    return [(s + SLOT, wh * w / weight) for s, w in free]
+
+
 steps = []
-n_fine = n_scaled = n_daily = 0
-wh_fine = wh_scaled = wh_daily = 0.0  # 5 minute values, the same days after scaling, daily yield only
+n_fine = n_scaled = n_filled = n_daily = 0
+wh_fine = wh_total = wh_daily = 0.0  # 5 minute values, the same days with the daily yield, daily yield only
 day, last_day = dt.date.fromisoformat(a.since), until.astimezone(local).date()
 while day <= last_day:
     times = by_day.get(day, [])
@@ -208,18 +222,24 @@ while day <= last_day:
            for p, t in zip(times, times[1:])]
     fine = sum(e for _, e in inc)
     total = yields.get(day) if day != last_day else None  # the day of --until is only partly before it
+    covered = [(p, t) for p, t in zip(times, times[1:]) if t - p <= a.max_gap]
     if fine > 0:
-        factor = max(1.0, total / fine) if total else 1.0
-        steps += [(t, e * factor) for t, e in inc]
-        n_fine += 1
-        n_scaled += factor > 1.02
         wh_fine += fine
-        wh_scaled += fine * factor
+        n_fine += 1
+        rest = sun(day, total - fine, covered) if total and total > 1.1 * fine else []
+        if rest:
+            # values missing for part of the day: the rest of the daily yield goes to the time without values
+            steps += inc + rest
+            n_filled += 1
+            wh_total += total
+        else:
+            # the portal's daily yield is a few percent above the 5 minute values
+            factor = max(1.0, total / fine) if total else 1.0
+            steps += [(t, e * factor) for t, e in inc]
+            n_scaled += factor > 1.02
+            wh_total += fine * factor
     elif total:
-        # no 5 minute values: a half sine between 6:00 and 20:00 local time, one step per hour
-        hours = [(h, math.sin(math.pi * (h - 6) / 14)) for h in range(7, 21)]
-        weight = sum(w for _, w in hours)
-        steps += [(int(dt.datetime.combine(day, dt.time(h), local).timestamp()), total * w / weight) for h, w in hours]
+        steps += sun(day, total)
         n_daily += 1
         wh_daily += total
     day += dt.timedelta(days=1)
@@ -243,6 +263,6 @@ with open(a.out, "w") as f:
             chunk = series[i:i + 10000]
             f.write(json.dumps({"metric": {"__name__": name, "source": "tsun"}, "values": [v for _, v in chunk],
                                 "timestamps": [t * 1000 for t, _ in chunk]}) + "\n")
-print(f"{n_fine} days with 5 minute values: {wh_fine / 1000:.1f} kWh, {n_scaled} days scaled up to the daily "
-      f"yield -> {wh_scaled / 1000:.1f} kWh; {n_daily} days with the daily yield only: {wh_daily / 1000:.1f} kWh; "
-      f"total {energy / 1000:.1f} kWh -> {a.out}", file=sys.stderr)
+print(f"{n_fine} days with 5 minute values: {wh_fine / 1000:.1f} kWh, with the daily yield {wh_total / 1000:.1f} kWh "
+      f"({n_scaled} scaled up, {n_filled} partly filled); {n_daily} days with the daily yield only: "
+      f"{wh_daily / 1000:.1f} kWh; total {energy / 1000:.1f} kWh -> {a.out}", file=sys.stderr)

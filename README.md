@@ -228,8 +228,9 @@ imported history without further changes. The script uses two requests of the po
   time (in one case from September 2023 on, for a plant online since April 2023).
 - `selectChartData` with `group=day`: the daily yield, one request per month, available since the start.
 
-Days with 5 minute values keep their power curve; if samples are missing, the counter is scaled up to the daily
-yield. Days with only a daily yield get it spread over the hours of a typical solar day (no power curve).
+Days with 5 minute values keep their power curve, the counter is scaled up by the few percent the daily yield is
+higher. If hours of a day are missing, the rest of the daily yield goes to these hours, spread like a typical solar
+day. Days with only a daily yield get it spread over the whole day that way (no power curve).
 
 1. Log in to talent-monitoring.com and open the device. In the browser dev tools (Network, filter `ChartData`)
    a request shows the `deviceGuid` and the `Authorization` header.
