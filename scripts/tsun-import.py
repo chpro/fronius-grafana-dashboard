@@ -54,7 +54,7 @@ class PortalError(Exception):
 
 def get(url, token, what):
     req = urllib.request.Request(url, headers={"Authorization": token, "User-Agent": "Mozilla/5.0"})
-    for attempt in range(4):  # the portal answers 502/504 now and then, especially for older data
+    for attempt in range(6):  # the portal answers 502/504 now and then, a quick retry usually succeeds
         try:
             return urllib.request.urlopen(req, timeout=180).read()
         except urllib.error.HTTPError as ex:
@@ -63,10 +63,10 @@ def get(url, token, what):
             error = f"HTTP {ex.code}"
         except (OSError, http.client.HTTPException) as ex:  # timeouts, lost connection (e.g. after standby)
             error = str(ex) or type(ex).__name__
-        if attempt == 3:
+        if attempt == 5:
             raise PortalError(f"{what}: {error}")
-        print(f"{what}: {error}, retrying in {30 * (attempt + 1)}s", file=sys.stderr)
-        time.sleep(30 * (attempt + 1))
+        print(f"{what}: {error}, retrying in 10s", file=sys.stderr)
+        time.sleep(10)
 
 
 def token():
