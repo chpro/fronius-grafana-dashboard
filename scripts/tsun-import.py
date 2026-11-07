@@ -24,6 +24,9 @@ Usage:
   python3 scripts/tsun-import.py --device <deviceGuid> --since 2023-04-30 --until 2026-11-03T12:10:00Z
   curl -X POST --data-binary @tsun-import.jsonl http://localhost:8428/api/v1/import
 
+The portal API is unofficial and may change. Not affiliated with or endorsed by TSUN. Use it with your own
+account and data only.
+
 Downloaded blocks are kept in --cache, a second run only fetches what is missing. The export is requested
 in UTC (timezone=+00:00), its timestamps are UTC then. Daily yields are per local calendar day (--tz).
 """
@@ -37,7 +40,7 @@ ap.add_argument("--tz", default="Europe/Berlin", help="timezone of the plant, fo
 ap.add_argument("--until", required=True, help="end (exclusive), ISO time with zone, e.g. 2026-11-03T12:10:00Z")
 ap.add_argument("--cache", default="tsun-cache")
 ap.add_argument("--out", default="tsun-import.jsonl")
-ap.add_argument("--days", type=int, default=7, help="days per request, smaller if the portal times out")
+ap.add_argument("--days", type=int, default=1, help="days per request; larger blocks often time out (HTTP 504)")
 ap.add_argument("--max-gap", type=int, default=900, help="seconds; longer gaps between samples add no energy")
 a = ap.parse_args()
 

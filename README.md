@@ -246,9 +246,10 @@ day. Days with only a daily yield get it spread over the whole day that way (no 
 3. Import: `curl -X POST --data-binary @tsun-import.jsonl http://localhost:8428/api/v1/import`.
    To undo: `curl 'http://localhost:8428/api/v1/admin/tsdb/delete_series?match[]={source="tsun"}'`.
 
-The portal API is unofficial and may change. The export is requested in UTC, the daily yields are local days
-(`--tz`, default `Europe/Berlin`). If the portal times out (HTTP 504), the script retries and falls back to
-single days, also after network errors. On a Mac, prefix the command with `caffeinate -i` so it does not
+The portal API is unofficial and may change. Not affiliated with or endorsed by TSUN. Use it with your own
+account and data only. The export is requested in UTC, the daily yields are local days (`--tz`, default
+`Europe/Berlin`). One request per day (`--days 1`, the default) takes about 25 s; larger blocks often time out
+(HTTP 504). The script retries after errors and falls back to single days. On a Mac, prefix the command with `caffeinate -i` so it does not
 stop when the Mac goes to sleep. Compared with a Shelly plug the TSUN values are about 1–3 % higher.
 
 ## Dashboard settings
