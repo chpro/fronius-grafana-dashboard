@@ -26,7 +26,7 @@ Usage:
 Downloaded blocks are kept in --cache, a second run only fetches what is missing. The export is requested
 in UTC (timezone=+00:00), its timestamps are UTC then. Daily yields are per local calendar day (--tz).
 """
-import argparse, datetime as dt, io, json, math, os, re, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
+import argparse, datetime as dt, http.client, io, json, math, os, re, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
 from zoneinfo import ZoneInfo
 
 ap = argparse.ArgumentParser()
@@ -60,10 +60,13 @@ def get(url, token, what):
         except urllib.error.HTTPError as ex:
             if ex.code < 500:
                 sys.exit(f"{what}: HTTP {ex.code}: {ex.read()[:300].decode(errors='replace')}")
-            if attempt == 3:
-                raise PortalError(f"{what}: HTTP {ex.code}")
-            print(f"{what}: HTTP {ex.code}, retrying in {30 * (attempt + 1)}s", file=sys.stderr)
-            time.sleep(30 * (attempt + 1))
+            error = f"HTTP {ex.code}"
+        except (OSError, http.client.HTTPException) as ex:  # timeouts, lost connection (e.g. after standby)
+            error = str(ex) or type(ex).__name__
+        if attempt == 3:
+            raise PortalError(f"{what}: {error}")
+        print(f"{what}: {error}, retrying in {30 * (attempt + 1)}s", file=sys.stderr)
+        time.sleep(30 * (attempt + 1))
 
 
 def token():
@@ -95,20 +98,23 @@ def daily(month):
             if c.get("energyToday") is not None}
 
 
+# cached exports by the days they cover, so runs with another --since or --days reuse them
+cached = {}
+for name in os.listdir(a.cache):
+    m = re.fullmatch(r"(\d{4}-\d\d-\d\d)_(\d{4}-\d\d-\d\d)\.xlsx", name)
+    if m:
+        cached[name] = tuple(dt.date.fromisoformat(x) for x in m.groups())
+
+
 def download(first, last):
     """xlsx files of the block; a block that keeps failing is fetched day by day."""
-    path = os.path.join(a.cache, f"{first}_{last}.xlsx")
-    if os.path.exists(path):
-        return [open(path, "rb").read()]
-    days = [first + dt.timedelta(days=i) for i in range((last - first).days + 1)]
-    if len(days) > 1 and all(os.path.exists(os.path.join(a.cache, f"{d}_{d}.xlsx")) for d in days):
-        return [b for d in days for b in download(d, d)]
     try:
-        return [fetch(first, last, path)]
+        return [fetch(first, last, os.path.join(a.cache, f"{first}_{last}.xlsx"))]
     except PortalError as ex:
-        if len(days) == 1:
+        if first == last:
             sys.exit(f"{ex}, giving up; run again later or with another --days")
         print(f"{ex}, fetching day by day", file=sys.stderr)
+        days = [first + dt.timedelta(days=i) for i in range((last - first).days + 1)]
         return [b for d in days for b in download(d, d)]
 
 
@@ -130,8 +136,8 @@ def fetch(first, last, path):
         body = get(BASE + file, token(), what)
         if not body.startswith(b"PK"):
             sys.exit(f"{what}: {file} is no xlsx: {body[:300].decode(errors='replace')}")
-    if next(rows(body), None):  # empty answers are not cached, the portal may still be catching up
-        open(path, "wb").write(body)
+    open(path, "wb").write(body)  # empty answers too: old 5 minute data is deleted by the portal
+    cached[os.path.basename(path)] = (first, last)
     time.sleep(1)
     return body
 
@@ -156,16 +162,24 @@ def rows(xlsx):
 
 
 samples = {}
+begin = dt.datetime.combine(dt.date.fromisoformat(a.since), dt.time(), local)
 day = dt.date.fromisoformat(a.since)
 while dt.datetime.combine(day, dt.time(), tz) < until:
-    last = day + dt.timedelta(days=a.days - 1)
+    cover = [(e, n) for n, (s, e) in cached.items() if s <= day <= e]
+    if cover:
+        last, name = max(cover)
+        files = [open(os.path.join(a.cache, name), "rb").read()]
+    else:
+        last = min([day + dt.timedelta(days=a.days - 1)] +
+                   [s - dt.timedelta(days=1) for s, _ in cached.values() if s > day])
+        files = download(day, last)
     n = 0
-    for ts, p in (r for x in download(day, last) for r in rows(x)):
+    for ts, p in (r for x in files for r in rows(x)):
         t = dt.datetime.strptime(ts[:16], "%Y-%m-%d %H:%M").replace(tzinfo=tz)
-        if t < until:
+        if begin <= t < until:
             samples[int(t.timestamp())] = p
             n += 1
-    print(f"{day} – {last}: {n} samples", file=sys.stderr)
+    print(f"{day} – {last}: {n} samples{' (cached)' if cover else ''}", file=sys.stderr)
     day = last + dt.timedelta(days=1)
 
 yields = {}

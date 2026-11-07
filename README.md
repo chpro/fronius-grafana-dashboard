@@ -247,7 +247,8 @@ yield. Days with only a daily yield get it spread over the hours of a typical so
 
 The portal API is unofficial and may change. The export is requested in UTC, the daily yields are local days
 (`--tz`, default `Europe/Berlin`). If the portal times out (HTTP 504), the script retries and falls back to
-single days. Compared with a Shelly plug the TSUN values are about 1–3 % higher.
+single days, also after network errors. On a Mac, prefix the command with `caffeinate -i` so it does not
+stop when the Mac goes to sleep. Compared with a Shelly plug the TSUN values are about 1–3 % higher.
 
 ## Dashboard settings
 
